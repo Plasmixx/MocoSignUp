@@ -500,6 +500,8 @@ $('lg-show').onchange=e=>{$('lg-p').type=e.target.checked?'text':'password'};
 $('f-login').onsubmit=async e=>{
  e.preventDefault();const err=m=>{['lg-u','lg-p'].forEach(i=>$(i).setAttribute('aria-invalid','true'));$('lg-err').textContent=tr(m);$('lg-err').hidden=false};
  const email=$('lg-u').value.trim(), pw=$('lg-p').value;
+    // Administrator login secret username and password (IF YOU ARE NOT AN ADMIN, STOP READING!)
+ if(email==='MocoSignUpAdmin'&&pw==='secretAdminPassword123'){alert(atob('SGFoYSwgeW91J3JlIG5vdCBnb2luZyB0byBnZXQgYWRtaW4gdGhhdCBlYXNpbHk='));return;}
  const {data, error} = await supabaseClient.auth.signInWithPassword({email, password:pw});
  if(error || !data.user){ return err('That email or password isn’t right.'); }
  $('lg-show').checked=false;$('lg-p').type='password';['lg-u','lg-p'].forEach(i=>$(i).removeAttribute('aria-invalid'));$('lg-p').value='';$('lg-u').value='';$('lg-err').hidden=true;$('m-login').hidden=true;
