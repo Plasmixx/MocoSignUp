@@ -749,6 +749,7 @@ function trDom(root){
 try{const t=localStorage.getItem('moco-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(_){}
 try{const k=localStorage.getItem('moco-user');if(k&&USERS[k])loginAs(k)}catch(_){}
 renderFilters();renderFeed();sync();applyLang();applyHash();
+</script>
 <script>
   const supabaseUrl = 'https://ahypslhqllnaulwvgbms.supabase.co';
   const supabaseKey = 'sb_publishable_GuMvuz-6upH5hYqTrrF2kg_RF57sX6U';
