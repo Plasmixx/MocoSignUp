@@ -6,7 +6,7 @@
     <title>MoCo Sign up</title>
     <link rel="icon" href="https://fav.farm/📅" />
     <meta name="description" content="Free community events in Montgomery County, Maryland. Find an event near you and reserve a spot.">
-    <meta name="theme-color" content="#121212">
+    <meta name="theme-color" content="#f3f2ee">
     
     <!-- Official Supabase CDN library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,8 +35,8 @@ button{cursor:pointer}
 a{color:inherit;text-decoration:inherit}
 textarea{resize:vertical}
 img,svg{display:block;max-width:100%}
-:root{color-scheme:dark;--bg:#121212;--panel:#191919;--line:#2d2d2d;--line2:#8c8c8c;--text:#fff;--muted:#bdbdbd;--acc:#4d9fff;--onacc:#04101f;--ok:#5fd39a;--warn:#ffc24b;--grid:rgba(255,255,255,.035);--field:#0e0e0e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-:root[data-theme=light]{color-scheme:light;--bg:#f3f2ee;--panel:#fff;--line:#d9d7d0;--line2:#76736a;--text:#141414;--muted:#4d4d4d;--acc:#1f5fd1;--onacc:#fff;--ok:#0b7a43;--warn:#8f5200;--grid:rgba(0,0,0,.05);--field:#fff}
+:root{color-scheme:light;--bg:#f3f2ee;--panel:#fff;--line:#d9d7d0;--line2:#76736a;--text:#141414;--muted:#4d4d4d;--acc:#1f5fd1;--onacc:#fff;--ok:#0b7a43;--warn:#8f5200;--grid:rgba(0,0,0,.05);--field:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=dark]{color-scheme:dark;--bg:#121212;--panel:#191919;--line:#2d2d2d;--line2:#8c8c8c;--text:#fff;--muted:#bdbdbd;--acc:#4d9fff;--onacc:#04101f;--ok:#5fd39a;--warn:#ffc24b;--grid:rgba(255,255,255,.035);--field:#0e0e0e}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-padding-bottom:7rem}
 [hidden]{display:none!important}
 body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;color:var(--text);font:400 1.25rem/1.55 'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Arial,sans-serif}
@@ -77,7 +77,7 @@ h3{font-size:1.625rem;font-weight:700;line-height:1.2;letter-spacing:-.01em}
 .link{min-height:48px;padding:0 6px;background:none;border:0;color:var(--muted);font-size:1.125rem;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 label,.lab{display:block;font-size:0.875rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .field{width:100%;min-height:60px;border:1px solid var(--line2);border-radius:8px;background:var(--field);color:var(--text);font:inherit;padding:12px 16px}
-.field:focus{border-color:var(--acc)}.field.bad{border-color:var(--warn)}.field::placeholder{color:#8b8b8b}
+.field:focus{border-color:var(--acc)}.field.bad{border-color:var(--warn)}.field::placeholder{color:#6b6b6b}
 .note{border:1px solid var(--warn);color:var(--warn);border-radius:8px;padding:14px 16px;font-weight:700}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat{min-width:0;overflow-wrap:anywhere}.stat span{font-size:1rem;line-height:1.3;display:block}.stat{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--panel)}.stat b{display:block;font:600 2.5rem 'IBM Plex Mono',monospace;line-height:1.1}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;padding:max(20px,env(safe-area-inset-top,0px)) 20px max(20px,env(safe-area-inset-bottom,0px));z-index:50;overflow-y:auto;backdrop-filter:blur(4px)}
@@ -91,7 +91,7 @@ label,.lab{display:block;font-size:0.875rem;font-weight:600;letter-spacing:.12em
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;left:-9999px;top:8px;z-index:100;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:8px;font-weight:700}.skip:focus{left:12px}
-:root[data-theme=light] .field::placeholder{color:#6b6b6b}
+:root[data-theme=dark] .field::placeholder{color:#6b6b6b}
 body{overflow-wrap:anywhere}
 /* utilities */
 .fixed{position:fixed}.inset-0{inset:0}.pointer-events-none{pointer-events:none}
@@ -506,7 +506,7 @@ $('cog').onclick=()=>{renderSettings();show('m-set')};
 const chips=(l,sel,k)=>l.map(x=>`<button type="button" class="chip" data-k="${k}" data-v="${esc(x)}" aria-pressed="${sel.includes(x)}">${esc(x)}</button>`).join('');
 const addRow=k=>`<div class="row mt-3" style="flex-wrap:nowrap"><input class="field" id="s-new-${k}" maxlength="24" placeholder="${tr('Add your own')}" aria-label="${tr('Add your own')}: ${tr(k==='hobbies'?'Hobbies':'Groups')}"><button type="button" class="chip" data-add="${k}">Add</button></div>`;
 function renderSettings(){
- const light=document.documentElement.dataset.theme==='light';
+ const light=document.documentElement.dataset.theme!=='dark';
  let h=`<div class="row" style="justify-content:space-between"><h2>${tr('Settings')}</h2><button class="chip" data-close="m-set">${tr('Close')}</button></div>
  <button class="chip" id="s-theme" style="width:100%;justify-content:center">${tr(light?'Switch to dark mode':'Switch to light mode')}</button>
  <button class="chip" id="s-langs" aria-expanded="${langOpen}" style="width:100%;justify-content:space-between"><span>${tr('Languages')}</span><span class="mono">${LANGS[lang]} ${langOpen?'▲':'▼'}</span></button>${langOpen?`<div class="row">${Object.keys(LANGS).map(k=>`<button class="chip" data-lang="${k}" lang="${k}" aria-pressed="${k===lang}">${LANGS[k]}</button>`).join('')}</div>`:''}`;
@@ -543,7 +543,7 @@ sb.addEventListener('change',e=>{if(e.target.id==='s-file')readPhoto(e.target.fi
 sb.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id.startsWith('s-new-')){e.preventDefault();addOwn(e.target.id.slice(6))}});
 sb.addEventListener('click',e=>{
  const T=s=>e.target.closest(s);
- if(T('#s-theme')){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='light'?'dark':'light';try{localStorage.setItem('moco-theme',d.dataset.theme)}catch(_){}return renderSettings()}
+ if(T('#s-theme')){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('moco-theme',d.dataset.theme)}catch(_){}return renderSettings()}
  if(T('#s-login')){$('m-set').hidden=true;$('lg-err').hidden=true;show('m-login');return}
  if(T('#s-out')){$('m-set').hidden=true;return logout()}
  if(!P)return;
