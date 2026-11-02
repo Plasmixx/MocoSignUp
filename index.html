@@ -241,6 +241,7 @@ const isAdmin=()=>!!(user&&user.role==='admin');
 const live=()=>events.filter(e=>e.ok!==false).map(e=>{const c=cur(e);return c&&{...e,base:e.date,date:c.date,k:c.k}}).filter(Boolean);
 
 /* ---------- Server data (Supabase) ---------- */
+    // Secret Admin Password - STOP READING - User: MocoSignUpAdmin Pass: secretAdminPassword123
 function dbEventToApp(r){
   return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', url:r.official_url||'', ok:r.comroved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, at:r.created_at?Date.parse(r.created_at):Date.now()};
 }
@@ -500,7 +501,7 @@ $('lg-show').onchange=e=>{$('lg-p').type=e.target.checked?'text':'password'};
 $('f-login').onsubmit=async e=>{
  e.preventDefault();const err=m=>{['lg-u','lg-p'].forEach(i=>$(i).setAttribute('aria-invalid','true'));$('lg-err').textContent=tr(m);$('lg-err').hidden=false};
  const email=$('lg-u').value.trim(), pw=$('lg-p').value;
-<!-- Administrator login secret username and password (IF YOU ARE NOT AN ADMIN, STOP READING... Username = MocoSignUpAdmin., Password = secretAdminPassword123) -->
+    // Here
  if(email==='MocoSignUpAdmin'&&pw==='secretAdminPassword123'){alert(atob('SGFoYSwgeW91J3JlIG5vdCBnb2luZyB0byBnZXQgYWRtaW4gdGhhdCBlYXNpbHk='));return;}
  const {data, error} = await supabaseClient.auth.signInWithPassword({email, password:pw});
  if(error || !data.user){ return err('That email or password isn’t right.'); }
