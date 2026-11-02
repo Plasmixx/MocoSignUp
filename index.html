@@ -856,19 +856,6 @@ try{ if(supabaseClient) supabaseClient.auth.onAuthStateChange(()=>{ refreshSessi
 refreshSession().then(()=>loadServerData());
 </script>
 <!-- Supabase client is now created before the main script, so the main script can use it on load. -->
-    <script>
-/* Smooth scroll + gentle entrance (fails silently if a CDN is blocked) */
-try{
-const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(!reduced&&typeof Lenis!=='undefined'){
-const lenis=new Lenis({lerp:0.09,smoothWheel:true});
-(function raf(t){lenis.raf(t);requestAnimationFrame(raf)})(0);
-}
-if(!reduced&&typeof gsap!=='undefined'){
-const els=['header .top','h1','header p.muted','.tabs'].map(s=>document.querySelector(s)).filter(Boolean);
-if(els.length)gsap.from(els,{y:14,opacity:0,duration:0.55,ease:'power2.out',stagger:0.08,clearProps:'all'});
-}
-}catch(_){}
-</script>
+
 </body>
 </html>
