@@ -180,6 +180,7 @@ input,select,textarea{min-width:0;max-width:100%}
  mocosignup.com is an independent prototype. It is not run by Montgomery County, Montgomery Parks or M-NCPPC. mocosignup.com is run and moderated by the community.
  <div class="row mt-4"><button class="link" data-info="help">Help</button><button class="link" data-info="privacy">Privacy</button><button class="link" data-info="terms">Terms</button><button class="link" data-info="access">Accessibility</button></div>
 <p style="margin-top:32px">Questions? Email help@mocosignup.com</p>
+    <button class="link" id="tour-again">Take the tour again</button>
 </footer>
 
 <div id="m-login" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="lg-t">
@@ -197,6 +198,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div id="m-set" class="ov" hidden role="dialog" aria-modal="true" aria-label="Settings"><div class="sheet stack" id="set-body" style="max-width:600px"></div></div>
 <div id="m-su" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="su-t"><form class="sheet stack" id="f-su" novalidate><p class="kicker">Reserve</p><h2 id="su-t"></h2><p class="muted">The organizer uses this only to contact you about this event.</p><div id="su-err" class="note" hidden role="alert"></div><div><label for="su-n">Your name</label><input class="field" id="su-n" aria-describedby="su-err" autocomplete="name" maxlength="40"></div><div><label for="su-c">Email</label><input class="field" id="su-c" aria-describedby="su-err" type="email" autocomplete="email" maxlength="60"></div><button class="btn" type="submit" id="su-b">Reserve my spot</button><button type="button" class="btn alt" data-close="m-su">Cancel</button></form></div>
 <div id="m-msg" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="msg-t"><form class="sheet stack" id="f-msg" novalidate><p class="kicker">Organizer</p><h2 id="msg-t">Message attendees</h2><p class="muted" id="msg-s"></p><div id="msg-err" class="note" hidden role="alert"></div><div><label for="msg-b">Message</label><textarea class="field" id="msg-b" aria-describedby="msg-err" rows="4" maxlength="300"></textarea></div><button class="btn" type="submit">Send message</button><button type="button" class="btn alt" data-close="m-msg">Cancel</button></form></div>
+<div id="m-tour" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="tour-t"><div class="sheet stack"><p class="kicker" id="tour-k">Welcome</p><h2 id="tour-t"></h2><p id="tour-b"></p><div class="row" style="justify-content:space-between"><button class="btn alt" id="tour-back" style="width:auto;padding:0 18px">Back</button><button class="btn" id="tour-next" style="width:auto;flex:1;padding:0 18px">Next</button></div><button class="link" id="tour-skip">Skip tour</button></div></div>
 <div id="m-info" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="info-t"><div class="sheet stack"><h2 id="info-t"></h2><p id="info-b"></p><button class="btn" data-close="m-info">Close</button></div></div>
 <div id="m-cel" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="cel-t"><div class="sheet text-center stack"><div class="ring"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2 id="cel-t" style="font-size:2.25rem"></h2><p id="cel-s" class="muted"></p><button class="btn" id="cel-ok" data-close="m-cel">Done</button></div></div>
 <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
@@ -830,7 +832,15 @@ function trDom(root){
   was=open;
  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden']});
  $('skip').onclick=e=>{e.preventDefault();$('main').focus()};}
-
+const TOUR=[{k:'Welcome',t:'Welcome to MoCo Sign up',b:'Free community events in Montgomery County, MD. You can browse and reserve a spot with no account.'},{k:'Step 1 of 4',t:'Find an event',b:'Pick a neighborhood, category, or date, or use Search. Tap an event to see where and when it is.'},{k:'Step 2 of 4',t:'Reserve a spot',b:'Tap Sign up, enter your name and email, then just show up. Only the organizer can see your name and email.'},{k:'Step 3 of 4',t:'Share an event',b:'Use the Create tab to post an event. New events are reviewed before they appear in the feed. Need help? Use Help in the footer, or email help@mocosignup.com.'}];
+let tourStep=0;
+function showTour(i){tourStep=Math.max(0,Math.min(TOUR.length-1,i));if(!$('m-tour'))return;$('tour-k').textContent=TOUR[tourStep].k;$('tour-t').textContent=TOUR[tourStep].t;$('tour-b').textContent=TOUR[tourStep].b;$('tour-back').hidden=tourStep===0;$('tour-next').textContent=tourStep===TOUR.length-1?'Done':'Next';show('m-tour')}
+function closeTour(){if($('m-tour'))$('m-tour').hidden=true;try{localStorage.setItem('moco-tour-seen','1')}catch(_){}}
+if($('tour-next'))$('tour-next').onclick=()=>{if(tourStep>=TOUR.length-1)closeTour();else showTour(tourStep+1)};
+if($('tour-back'))$('tour-back').onclick=()=>showTour(tourStep-1);
+if($('tour-skip'))$('tour-skip').onclick=closeTour;
+if($('tour-again'))$('tour-again').onclick=()=>showTour(0);
+try{if(!localStorage.getItem('moco-tour-seen'))showTour(0)}catch(_){showTour(0)}
 /* ---------- Init ---------- */
 try{const t=localStorage.getItem('moco-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(_){}
 function saveDraft(){if(editing)return;try{localStorage.setItem('moco-draft',JSON.stringify({title:$('f-title').value,hood:$('f-hood').value,cat:$('f-cat').value,date:$('f-date').value,time:$('f-time').value,place:$('f-place').value,spots:$('f-spots').value,rep:$('f-rep').value,url:$('f-url').value,desc:$('f-desc').value,acc:[...document.querySelectorAll('#f-acc input:checked')].map(i=>i.value),hot:$('f-hot')?$('f-hot').checked:false}))}catch(_){}}
