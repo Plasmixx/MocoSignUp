@@ -135,7 +135,7 @@ input,select,textarea{min-width:0;max-width:100%}
  </nav>
 </header>
 
-<main id="main" tabindex="-1" class="wrap" style="padding-bottom:80px">
+<main id="main" tabindex="-1" class="wrap" style="padding-bottom:32px">
  <div id="offline" class="note mt-6" role="status" hidden>You’re offline. Some features may not work.</div>
  <section id="v-feed" class="mt-10">
   <p class="kicker mb-3" id="fl">Where are you?</p>
@@ -176,9 +176,9 @@ input,select,textarea{min-width:0;max-width:100%}
  <section id="v-staff" class="mt-10" hidden><p class="kicker">Restricted</p><h2 class="mt-2 mb-6">Admin</h2><div id="staff"></div></section>
 </main>
 
-<footer class="wrap muted" style="font-size:1rem;padding-bottom:48px">
+<footer class="wrap muted" style="font-size:1rem;margin-top:48px;padding-top:32px;padding-bottom:48px;background:var(--panel);border-top:1px solid var(--line2)">
  mocosignup.com is an independent prototype. It is not run by Montgomery County, Montgomery Parks or M-NCPPC. mocosignup.com is run and moderated by the community.
- <div class="row mt-4"><button class="chip" data-info="help">Help</button><button class="chip" data-info="privacy">Privacy</button><button class="chip" data-info="terms">Terms</button><button class="chip" data-info="access">Accessibility</button></div>
+ <div class="row mt-4"><button class="link" data-info="help">Help</button><button class="link" data-info="privacy">Privacy</button><button class="link" data-info="terms">Terms</button><button class="link" data-info="access">Accessibility</button></div>
 <p style="margin-top:32px">Questions? Email help@mocosignup.com</p>
 </footer>
 
@@ -361,7 +361,8 @@ function card(e){
 function renderFeed(){
  const list=live().filter(e=>(one===null||e.id===one)&&(hood==='All'||e.hood===hood)&&(!hot||e.hot||going(e)>=HOT)&&(cat==='All'||e.cat===cat)&&(!accOnly||(e.acc||[]).includes('Wheelchair accessible'))&&dwOk(e)&&(!sq||(e.title+' '+e.place+' '+e.desc+' '+e.hood).toLowerCase().includes(sq))).sort(hot?(a,b)=>(b.hot?1:0)-(a.hot?1:0)||going(b)-going(a):(a,b)=>(b.hot?1:0)-(a.hot?1:0)||(a.date+a.time).localeCompare(b.date+b.time))
  $('count').textContent=list.length?T(list.length===1?'{n} upcoming event{h}{o}':'{n} upcoming events{h}{o}',{n:list.length,h:hood==='All'?'':' / '+hood,o:hot?' / '+tr('hot only'):''}):'';
- $('feed').innerHTML=list.length?list.map(card).join(''):`<div class="card text-center"><h3>${hot?'No hot events here right now':'No events here yet'}</h3><p class="muted mt-2">${hot?'Turn off Hot events or try another neighborhood.':'Try another neighborhood, or add one in Create.'}</p></div>`;
+$('prt').hidden=!list.length;
+$('feed').innerHTML=list.length?list.map(card).join(''):`<div class="card text-center"><h3>${hot?'No hot events here right now':'No events here yet'}</h3><p class="muted mt-2">${hot?'Turn off Hot events or try another neighborhood.':'Try another neighborhood, or add one in Create.</p><p class="muted mt-4">How it works: pick a neighborhood, reserve a spot, then just show up.'}</p></div>`;
 }
 $('filters').onclick=e=>{const b=e.target.closest('[data-h]');if(b){hood=b.dataset.h;renderFilters();renderFeed()}};
 $('hot').onclick=()=>{hot=!hot;renderFilters();renderFeed()};
