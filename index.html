@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>mocosignup.app</title>
+<meta name="description" content="Free community events in Montgomery County, Maryland. Find an event near you and reserve a spot.">
+<meta name="theme-color" content="#121212">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta property="og:type" content="website"><meta property="og:site_name" content="mocosignup.app">
+<meta property="og:title" content="mocosignup.app: free community events near you">
+<meta property="og:description" content="Pick your neighborhood and reserve a spot at free community events in Montgomery County, Maryland.">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* base reset */
+*,*::before,*::after{box-sizing:border-box;border:0 solid}
+html{-webkit-text-size-adjust:100%}
+h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
+h1,h2,h3{font-size:inherit;font-weight:inherit}
+ul,ol{list-style:none;padding:0}
+button,input,select,textarea{font:inherit;color:inherit;margin:0;padding:0;background:transparent}
+button{cursor:pointer}
+a{color:inherit;text-decoration:inherit}
+textarea{resize:vertical}
+img,svg{display:block;max-width:100%}
+:root{color-scheme:dark;--bg:#121212;--panel:#191919;--line:#2d2d2d;--line2:#8c8c8c;--text:#fff;--muted:#bdbdbd;--acc:#4d9fff;--onacc:#04101f;--ok:#5fd39a;--warn:#ffc24b;--grid:rgba(255,255,255,.035);--field:#0e0e0e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=light]{color-scheme:light;--bg:#f3f2ee;--panel:#fff;--line:#d9d7d0;--line2:#76736a;--text:#141414;--muted:#4d4d4d;--acc:#1f5fd1;--onacc:#fff;--ok:#0b7a43;--warn:#8f5200;--grid:rgba(0,0,0,.05);--field:#fff}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-padding-bottom:7rem}
+[hidden]{display:none!important}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;color:var(--text);font:400 1.25rem/1.55 'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Arial,sans-serif}
+.mono,.kicker,label,.lab,.tag,.date,.meta,.cap{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+:focus-visible,.field:focus,.field:focus-within{outline:3px solid var(--text);outline-offset:3px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:20px 0 8px}
+.logo{font:600 1.375rem 'IBM Plex Mono',monospace;letter-spacing:-.03em}.logo span{color:var(--acc)}
+.kicker{font-size:0.8125rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:10px;animation:pulse 2s 2}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-size:clamp(2.25rem,8vw,3.625rem);line-height:1.02;font-weight:700;letter-spacing:-.035em;margin:16px 0 12px}
+h2{font-size:1.875rem;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+h3{font-size:1.625rem;font-weight:700;line-height:1.2;letter-spacing:-.01em}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin-top:28px}
+.tab{min-height:58px;padding:0 20px;font-size:1.25rem;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap}
+.tab[aria-current=page]{color:var(--text);border-bottom-color:var(--acc)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stack>*+*{margin-top:18px}
+.chip{min-height:52px;padding:0 18px;border:1px solid var(--line2);border-radius:8px;background:transparent;color:var(--text);font-weight:700;font-size:1.1875rem;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .15s,border-color .15s}
+.chip:hover{border-color:var(--text)}
+.chip small{font:500 0.875rem 'IBM Plex Mono',monospace;opacity:.7}
+.chip[aria-pressed=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
+#hot[aria-pressed=true]{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px}
+.ev{display:grid;grid-template-columns:78px minmax(0,1fr);gap:22px}
+.date{border:1px solid var(--line2);border-radius:8px;text-align:center;padding:8px 0;align-self:start}
+.date b{display:block;font-size:1.875rem;line-height:1.1}.date span{display:block;font-size:0.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta{font-size:0.9375rem;letter-spacing:.06em;color:var(--muted);margin:6px 0 4px}
+.tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:.14em;padding:2px 8px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;margin-bottom:8px}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:18px}.bar i{display:block;height:100%;background:var(--acc)}
+.cap{font-size:0.9375rem;color:var(--muted);margin:8px 0 18px}.cap b{color:var(--text)}
+.btn{min-height:64px;width:100%;border:0;border-radius:8px;background:var(--acc);color:var(--onacc);font:700 1.375rem 'Atkinson Hyperlegible',sans-serif;cursor:pointer;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.985)}
+.btn.alt{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn.done{background:transparent;color:var(--ok);border:2px solid var(--ok);cursor:default;filter:none}
+.link{min-height:48px;padding:0 6px;background:none;border:0;color:var(--muted);font-size:1.125rem;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+label,.lab{display:block;font-size:0.875rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field{width:100%;min-height:60px;border:1px solid var(--line2);border-radius:8px;background:var(--field);color:var(--text);font:inherit;padding:12px 16px}
+.field:focus{border-color:var(--acc)}.field.bad{border-color:var(--warn)}.field::placeholder{color:#8b8b8b}
+.note{border:1px solid var(--warn);color:var(--warn);border-radius:8px;padding:14px 16px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat{min-width:0;overflow-wrap:anywhere}.stat span{font-size:1rem;line-height:1.3;display:block}.stat{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--panel)}.stat b{display:block;font:600 2.5rem 'IBM Plex Mono',monospace;line-height:1.1}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;padding:max(20px,env(safe-area-inset-top,0px)) 20px max(20px,env(safe-area-inset-bottom,0px));z-index:50;overflow-y:auto;backdrop-filter:blur(4px)}
+.sheet{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:28px;width:100%;max-width:540px;margin:auto;animation:rise .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes rise{from{transform:translateY(26px) scale(.96);opacity:0}}
+.ring{width:84px;height:84px;border-radius:50%;border:2px solid var(--acc);color:var(--acc);display:grid;place-items:center;margin:0 auto}
+.sw{width:48px;height:48px;border-radius:50%;border:3px solid var(--line2);cursor:pointer;box-shadow:inset 0 0 0 2px var(--panel)}.sw[aria-pressed=true]{border-color:var(--text);box-shadow:inset 0 0 0 2px var(--panel),0 0 0 2px var(--text)}
+.avatar{display:grid;place-items:center;border-radius:50%;color:#111;font:600 1.375rem 'IBM Plex Mono',monospace;flex:none;object-fit:cover}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(24px + env(safe-area-inset-bottom,0px));max-width:460px;margin:0 auto;background:var(--text);color:var(--bg);font-weight:700;border-radius:8px;padding:16px 20px;z-index:80;text-align:center}
+@media(max-width:480px){.ev{grid-template-columns:minmax(0,1fr);gap:14px}.date{display:flex;flex-wrap:wrap;max-width:100%;gap:4px 10px;align-items:baseline;width:max-content;padding:6px 14px}.date b{font-size:1.375rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-9999px;top:8px;z-index:100;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:8px;font-weight:700}.skip:focus{left:12px}
+:root[data-theme=light] .field::placeholder{color:#6b6b6b}
+body{overflow-wrap:anywhere}
+/* utilities */
+.fixed{position:fixed}.inset-0{inset:0}.pointer-events-none{pointer-events:none}
+.grid{display:grid}.gap-5{gap:1.25rem}
+.text-center{text-align:center}.list-disc{list-style:disc}.pl-6{padding-left:1.5rem}.font-normal{font-weight:400}
+.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-10{margin-top:2.5rem}
+.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}
+@media(min-width:640px){.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{
+ body{background:#fff!important;color:#000!important}
+ .top,.tabs,#filters,#cats,#dates,#hot,#accf,#prt,.kicker,#q,label,footer,.ov,#toast,#live,#confetti,.skip,#one,#offline,.btn,.link,.bar,#v-mgr,#v-mine,#v-staff,noscript{display:none!important}
+ .card{background:#fff!important;border:1px solid #000!important;color:#000!important;break-inside:avoid;padding:12pt}
+ .muted,.meta,.cap,.date span{color:#222!important}.tag{border-color:#000!important;color:#000!important}.date{border-color:#000!important}
+}
+.top{flex-wrap:wrap;gap:12px}.logo{min-width:0;overflow-wrap:anywhere}
+.chip,.tab{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.grid>*,.row>*,.ev>div,.stat,.card{min-width:0}
+input,select,textarea{min-width:0;max-width:100%}
+@media (forced-colors:active){.bar i{background:Highlight;forced-color-adjust:none}.sw,.avatar,.dot{forced-color-adjust:none}.btn{border:2px solid ButtonText}.chip[aria-pressed=true],.tab[aria-current=page]{outline:2px solid Highlight}}
+</style>
+</head>
+<body>
+<noscript><p class="note" style="margin:20px">This page needs JavaScript to show events. Please turn it on in your browser settings.</p></noscript>
+<a href="#main" class="skip" id="skip">Skip to main content</a>
+<header class="wrap">
+ <div class="top">
+  <div class="logo">mocosignup<span>.app</span></div>
+  <div class="row">
+      <button class="chip" id="cog" aria-label="Settings" style="padding:0;width:52px;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+ </div>
+ <p class="kicker mt-8"><i class="dot"></i>Montgomery County, MD / Community events</p>
+ <h1>What’s on near you</h1>
+ <p class="muted" style="max-width:560px">Free community events. Pick your neighborhood, then reserve a spot. No account needed.</p>
+ <nav class="tabs" aria-label="Sections">
+  <button class="tab" id="t-feed" data-v="feed" aria-current="page">Events</button>
+  <button class="tab" id="t-mgr" data-v="mgr">Create</button>
+  <button class="tab" id="t-mine" data-v="mine">My events</button>
+  <button class="tab" id="t-staff" data-v="staff" hidden>Admin</button>
+ </nav>
+</header>
+
+<main id="main" tabindex="-1" class="wrap" style="padding-bottom:80px">
+ <div id="offline" class="note mt-6" role="status" hidden>You’re offline. Some features may not work.</div>
+ <section id="v-feed" class="mt-10">
+  <p class="kicker mb-3" id="fl">Where are you?</p>
+  <div class="row" id="filters" role="group" aria-labelledby="fl"></div>
+  <div class="mt-4"><label for="q">Search</label><input class="field" id="q" type="search" placeholder="Try “yoga” or “library”" autocomplete="off"></div>
+  <div class="row mt-4"><button class="chip" id="hot" aria-pressed="false"></button><button class="chip" id="accf" aria-pressed="false">Accessible only</button><button class="chip" id="prt">Print list</button></div>
+  <p class="kicker mt-6 mb-3">Category</p><div class="row" id="cats"></div>
+  <p class="kicker mt-6 mb-3">When</p><div class="row" id="dates"></div>
+  <div id="one" class="note mt-6" role="status" hidden><span>Showing one shared event.</span> <button type="button" class="link" id="show-all">Show all events</button></div>
+  <h2 class="sr">Events</h2>
+  <p class="kicker mt-10 mb-5" id="count" aria-live="polite"></p>
+  <div id="feed" class="stack" style="--g:24px"><p class="muted">Loading events…</p></div>
+ </section>
+
+ <section id="v-mgr" class="mt-10" hidden>
+  <p class="kicker">New event</p><h2 class="mt-2">Create an event</h2>
+  <p class="muted mt-2 mb-8">Letters, numbers and basic punctuation only. No links, emails, phone numbers, ALL CAPS or money-related words. New events are reviewed by parks staff before they appear.</p>
+  <form id="f-new" class="card stack" novalidate>
+   <div id="warn" class="note" role="alert" hidden></div>
+   <div><label for="f-title">Event name</label><input class="field" id="f-title" aria-describedby="warn" placeholder="Morning walking club" autocomplete="off"></div>
+   <div><label for="f-hood">Neighborhood</label><select class="field" id="f-hood" aria-describedby="warn"><option value="">Choose one</option></select></div>
+   <div><label for="f-cat">Category</label><select class="field" id="f-cat" aria-describedby="warn"><option value="">Choose one</option></select></div>
+   <div class="grid sm:grid-cols-2 gap-5"><div><label for="f-date">Date</label><input class="field" type="date" id="f-date" aria-describedby="warn"></div><div><label for="f-time">Start time</label><input class="field" type="time" id="f-time" aria-describedby="warn"></div></div>
+   <div><label for="f-place">Location</label><input class="field" id="f-place" aria-describedby="warn" placeholder="Rockville Senior Center" autocomplete="off"></div>
+   <div><label for="f-spots">Spots</label><input class="field" type="number" min="1" max="100" id="f-spots" aria-describedby="warn" placeholder="20"></div>
+   <div><label for="f-rep">Repeat</label><select class="field" id="f-rep"><option value="0">Does not repeat</option></select></div>
+   <div><label for="f-url">Official registration link (optional)</label><input class="field" id="f-url" type="url" aria-describedby="warn" placeholder="https://" autocomplete="off" maxlength="200"></div>
+   <div id="f-acc"><p class="lab">Accessibility (check all that apply)</p></div>
+   <div><label for="f-desc">What to expect</label><textarea class="field" id="f-desc" aria-describedby="warn" rows="3" placeholder="A short, friendly description"></textarea></div>
+   <button class="btn" type="submit" id="f-btn">Publish event</button>
+   <button class="btn alt" type="button" id="f-cancel" hidden>Cancel editing</button>
+  </form>
+ </section>
+
+
+ <section id="v-mine" class="mt-10" hidden><p class="kicker">Organizer</p><h2 class="mt-2">My events</h2><p class="muted mt-2 mb-6">Events you posted, including ones waiting for review.</p><div id="mine" class="stack"></div></section>
+ <section id="v-staff" class="mt-10" hidden><p class="kicker">Restricted</p><h2 class="mt-2 mb-6">Admin</h2><div id="staff"></div></section>
+</main>
+
+<footer class="wrap muted" style="font-size:1rem;padding-bottom:48px">
+ mocosignup.app is an independent prototype with sample events. It is not run by Montgomery County, Montgomery Parks or M-NCPPC.
+ <div class="row mt-4"><button class="chip" data-info="help">Help</button><button class="chip" data-info="privacy">Privacy</button><button class="chip" data-info="terms">Terms</button><button class="chip" data-info="access">Accessibility</button></div>
+</footer>
+
+<div id="m-login" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="lg-t">
+ <form class="sheet stack" id="f-login" novalidate>
+  <p class="kicker">Account</p><h2 id="lg-t">Log in</h2>
+  <p class="muted">You don’t need an account to browse, sign up or post. Log in to personalize your profile or use admin tools.</p>
+  <div id="lg-err" class="note" role="alert" hidden></div>
+  <div><label for="lg-u">Username</label><input class="field" id="lg-u" aria-describedby="lg-err" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+  <div><label for="lg-p">Password</label><input class="field" id="lg-p" aria-describedby="lg-err" type="password" autocomplete="current-password"></div>
+  <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="lg-show" style="width:24px;height:24px"> <span>Show password</span></label>
+  <button class="btn" type="submit">Log in</button>
+  <button type="button" class="btn alt" data-close="m-login">Cancel</button>
+  <p class="muted" style="font-size:1rem">Demo member: margaret / garden2026</p>
+ </form>
+</div>
+<div id="m-set" class="ov" hidden role="dialog" aria-modal="true" aria-label="Settings"><div class="sheet stack" id="set-body" style="max-width:600px"></div></div>
+<div id="m-su" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="su-t"><form class="sheet stack" id="f-su" novalidate><p class="kicker">Reserve</p><h2 id="su-t"></h2><p class="muted">The organizer uses this only to contact you about this event.</p><div id="su-err" class="note" hidden role="alert"></div><div><label for="su-n">Your name</label><input class="field" id="su-n" aria-describedby="su-err" autocomplete="name" maxlength="40"></div><div><label for="su-c">Email</label><input class="field" id="su-c" aria-describedby="su-err" type="email" autocomplete="email" maxlength="60"></div><button class="btn" type="submit" id="su-b">Reserve my spot</button><button type="button" class="btn alt" data-close="m-su">Cancel</button></form></div>
+<div id="m-msg" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="msg-t"><form class="sheet stack" id="f-msg" novalidate><p class="kicker">Organizer</p><h2 id="msg-t">Message attendees</h2><p class="muted" id="msg-s"></p><div id="msg-err" class="note" hidden role="alert"></div><div><label for="msg-b">Message</label><textarea class="field" id="msg-b" aria-describedby="msg-err" rows="4" maxlength="300"></textarea></div><button class="btn" type="submit">Send message</button><button type="button" class="btn alt" data-close="m-msg">Cancel</button></form></div>
+<div id="m-info" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="info-t"><div class="sheet stack"><h2 id="info-t"></h2><p id="info-b"></p><button class="btn" data-close="m-info">Close</button></div></div>
+<div id="m-cel" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="cel-t"><div class="sheet text-center stack"><div class="ring"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2 id="cel-t" style="font-size:2.25rem"></h2><p id="cel-s" class="muted"></p><button class="btn" id="cel-ok" data-close="m-cel">Done</button></div></div>
+<div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
+<div id="toast" role="status" hidden></div>
+<canvas id="confetti" class="fixed inset-0 pointer-events-none" style="z-index:70" aria-hidden="true"></canvas>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const HOODS=['Rockville','Silver Spring','Bethesda','Germantown','Gaithersburg'];
+const HOBBIES=['Walking','Gardening','Painting','Cooking','Reading','Card games','Yoga','Music','Birdwatching','Volunteering'];
+const GROUPS=['Walking Club','Book Circle','Tech Helpers','Garden Society','Arts & Crafts','Wellness Circle'];
+const COLORS=['#4d9fff','#4cc9f0','#f7b32b','#5fd39a','#e5738a','#9b8cff','#c9c9c9','#7bd4c8'];
+const USERS={plasmixx:{name:'Plasmixx',pw:'mocosignupadmin123',role:'admin'},margaret:{name:'Margaret S.',pw:'garden2026',role:'member'}};
+const FLAME='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .5 2 1.5 2.5 2 2.5C11 8 10 5 12 2z"/></svg>';
+const addD=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('en-CA')};
+let events=[
+ {id:1,cat:'Fitness',acc:['Wheelchair accessible','Seating provided'],title:'Chair Yoga & Gentle Stretch',hood:'Rockville',date:addD(4),reps:8,time:'10:00',place:'Rockville Senior Center',spots:12,desc:'A seated, low-impact class. Wear comfortable clothes. Mats and chairs are provided.'},
+ {id:2,cat:'Learning',acc:['Wheelchair accessible','Near public transit'],title:'Smartphone Basics: Tea & Tech Help',hood:'Silver Spring',date:addD(6),time:'13:30',place:'Silver Spring Library, Meeting Room B',spots:8,desc:'Volunteers help with photos, video calls and text messages. Bring your own phone.'},
+ {id:3,cat:'Outdoors',acc:['Free parking'],title:'Trolley Trail Morning Walk',hood:'Bethesda',date:addD(8),reps:4,time:'09:00',place:'Bethesda Trolley Trail Trailhead',spots:20,desc:'An easy, flat, one-mile loop with benches along the way. Coffee afterward.'},
+ {id:4,cat:'Arts',acc:['Wheelchair accessible','Seating provided','Free parking'],title:'Watercolor for Beginners',hood:'Germantown',date:addD(10),time:'11:00',place:'BlackRock Center for the Arts',spots:10,desc:'No experience needed. All paints, brushes and paper are included.'},
+ {id:5,cat:'Health',acc:['Wheelchair accessible','Hearing loop','Near public transit'],title:'Medicare Open Enrollment Info Session',hood:'Gaithersburg',date:addD(12),time:'14:00',place:'Gaithersburg Library, Main Hall',spots:30,desc:'Counselors explain plan options and answer your questions. Free and unbiased.'},
+ {id:6,cat:'Fitness',acc:['Free parking'],title:'Pickleball Basics for Beginners',hood:'Germantown',date:addD(14),time:'10:30',place:'Germantown Community Park Courts',spots:0,desc:'Learn the rules and rally with friendly coaches. Paddles and balls are provided.'}
+];
+const GOING={1:34,2:21,3:58,4:17,5:46,6:24},HOT=30;
+let nextId=7,hood='All',hot=false,view='feed',reserved=new Set(),user=null,P=null,reports=[],blocked=new Set(),tt,waitlisted=new Set(),signups=[],sq='',delAsk=null,editing=null,contact=null,suId=null,lastPost=0,lang='en',langOpen=false,cat='All',dw='any',accOnly=false,msgFor=null;
+const OCC_H=3;
+function cur(e){const now=Date.now();for(let k=0;k<=(e.reps||0);k++){const d=new Date(e.date+'T'+e.time+':00');d.setDate(d.getDate()+7*k);if(now<d.getTime()+OCC_H*36e5)return{k,date:d.toLocaleDateString('en-CA')}}return null}
+const lastD=e=>{const d=new Date((e.base||e.date)+'T12:00:00');d.setDate(d.getDate()+7*(e.reps||0));return d.toLocaleDateString('en-CA')};
+const occOf=id=>{const e=events.find(x=>x.id===id),c=e&&cur(e);return id+'@'+(c?c.date:'end')};
+const takenId=id=>{const ev=events.find(x=>x.id===id),c=ev&&cur(ev);return c?signups.filter(s=>s.id===id&&s.d===c.date&&!s.wl).length:0};
+const going=e=>(GOING[e.id]||0)+takenId(e.id);
+let one=null;
+const isAdmin=()=>!!(user&&user.role==='admin');
+const live=()=>events.filter(e=>e.ok!==false).map(e=>{const c=cur(e);return c&&{...e,base:e.date,date:c.date,k:c.k}}).filter(Boolean);
+const LOC={en:'en-US',es:'es-US',zh:'zh-CN',fr:'fr-FR',ko:'ko-KR'};
+const dp=d=>{const x=new Date(d+'T12:00:00'),L=LOC[lang];return{m:x.toLocaleDateString(L,{month:'short'}),d:x.getDate(),w:x.toLocaleDateString(L,{weekday:'short'})}};
+const tm=t=>{const[h,m]=t.split(':').map(Number);return lang==='en'?`${h%12||12}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`:new Date(2000,0,1,h,m).toLocaleTimeString(LOC[lang],{hour:'numeric',minute:'2-digit'})};
+const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString(LOC[lang],{weekday:'long',month:'long',day:'numeric'});
+document.addEventListener('focusin',e=>{const t=document.getElementById('toast');if(!t||t.hidden)return;const a=e.target.getBoundingClientRect(),b=t.getBoundingClientRect();if(a.bottom>b.top&&a.top<b.bottom&&a.right>b.left&&a.left<b.right){if(t.style.top){t.style.top='';t.style.bottom=''}else{t.style.bottom='auto';t.style.top='calc(16px + env(safe-area-inset-top,0px))'}}});
+function toast(m){const t=$('toast');t.style.top='';t.style.bottom='';t.textContent=tr(m);t.hidden=false;{const l=$('live');l.textContent='';setTimeout(()=>l.textContent=tr(m),60)}clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,7000)}
+const show=id=>$(id).hidden=false;
+
+/* ---------- Moderation ---------- */
+const BADL='inappropriate language',LEET={'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','$':'s','!':'i','|':'i','+':'t'};
+const STRONG=['shithead','dipshit','horseshit','arsehole','asswipe','bollocks','fuckwit','blowjob','handjob','dildo','pedophile','bukkake','scumbag','douchebag','jerkoff','cumshot','dickwad','fuck','shit','bitch','asshole','bastard','pussy','whore','slut','cunt','motherfucker','bullshit','cocksucker','jackass','dumbass','douche','wanker','dickhead'];
+const EXACT=['cp','prick','bugger','wank','tosser','bellend','jizz','boner','orgasm','orgy','erotic','fetish','hentai','milf','pedo','paedo','incest','molest','molester','rapist','stripper','prostitute','dyke','raghead','towelhead','beaner','honky','dago','wop','coolie','paki','pakis','spaz','mongoloid','hitler','heil','swastika','terrorist','massacre','kidnap','cocaine','heroin','meth','lsd','ecstasy','idiot','idiots','moron','morons','imbecile','pervert','stupid','fuq','fuxk','phuck','phuk','azz','biotch','sexting','nudes','nudity','naughty','cumming','threesome','masturbate','masturbation','vibrator','damn','goddamn','dammit','damnit','crap','piss','pissed','ass','arse','cock','sex','sexy','porn','nude','naked','nazi','rape','kkk','wtf','stfu','fk','fuk','fck','sht','btch','tits','boobs','anal','cum','horny','xxx','twat','kike','spic','gook','wetback','tranny'];
+const SLURS=['nigg','niqq','fagg','retard'];
+const SCAMF=['bitcoin','crypto','venmo','cashapp','lottery','casino','giveaway','investment','password','guaranteed','paypal','gambling'];
+const SCAME=['viagra','cialis','payday','sugardaddy','betting','zelle','winner','winners','jackpot','sweepstakes'];
+const PHR=['sugar daddy','adult content','dating site','hook up','escort service','free money','gift card','wire transfer','social security number','act now','cash prize','get rich','western union','credit card','bank account','pin number','limited time','click here','miracle cure','send money','make money','double your money'];
+const ALLOW=new Set(['push','block','blocks','blocked','walker','walkers','crypt','crypts','guarantee','guarantees','mishit','bullocks','sit','suit','slit','skit','spit','snit','shot','shut','shat','ship','shin','shim','shiv','shift','shirt','sheet','shoot','shih','shitake','batch','butch','bench','birch','count','cut','cant','cent','curt','cult','slot','slat','slug','slum','slur','whole','where','whose','whorl','wore','pushy','funk','fink','bustard','douse','wander','scunthorpe','retardant','retardants','casing','ashore','jackal','jackals']);
+const col=s=>s.replace(/(.)\1+/g,'$1'),runs=w=>w.replace(/(.)\1*/g,(m,c)=>c+'{'+m.length+',}');
+const rx=(l,a)=>l.map(w=>new RegExp((a?'^':'')+runs(w)+(a?'$':'')));
+const STRONGC=STRONG.map(col),STRE=rx(STRONG,1),EXRE=rx(EXACT,1),SLRE=rx(SLURS,0),SCAMER=rx(SCAME,1);
+const PHRC=PHR.map(p=>({p,n:' '+p.split(' ').map(col).join(' ')+' ',q:col(p.replace(/ /g,''))}));
+function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
+const near=(c,b)=>c[0]===b[0]&&Math.abs(c.length-b.length)<=1&&lev(c,b)<=1;
+function flag(w,hit){
+ if(ALLOW.has(w))return;const c=col(w);if(ALLOW.has(c))return;
+ if(EXRE.some(r=>r.test(w))||STRE.some(r=>r.test(w))||SLRE.some(r=>r.test(w))||STRONGC.some(b=>c.includes(b))||(c.length>2&&STRONGC.some(b=>near(c,b))))hit.add(BADL);
+ SCAME.forEach((b,i)=>{if(SCAMER[i].test(w))hit.add(b)});
+ SCAMF.forEach(b=>{if(c.length>=5&&near(c,col(b)))hit.add(b)});
+}
+function findRestricted(s){
+ s=String(s).replace(/\bvan\s+dyke\b/gi,'vandyke');
+ const hit=new Set(),SUF=['re','ll','ve','s','t','d','m'];
+ [s,s.replace(/[0-9@$!|+]/g,c=>LEET[c]||c)].forEach(v=>{
+  const t=v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]+/g,' ').trim().split(' ').filter(Boolean),toks=[];let run='';
+  t.forEach(w=>{if(w.length===1)run+=w;else{if(run.length>1)toks.push(run);run='';toks.push(w)}});if(run.length>1)toks.push(run);
+  new Set([...t,...toks]).forEach(w=>flag(w,hit));
+  for(let i=0;i<t.length-1;i++)if(!SUF.includes(t[i+1])&&STRE.some(r=>r.test(t[i]+t[i+1])))hit.add(BADL);
+  const norm=' '+t.map(col).join(' ')+' ',sq=col(t.join(''));
+  PHRC.forEach(p=>{if(norm.includes(p.n)||(p.q.length>=9&&sq.includes(p.q)))hit.add(p.p)});
+ });
+ return [...hit];
+}
+const textBad=s=>{const r=[];if(/(https?:|www\.|\.com\b|\.net\b|\.org\b|\.io\b|@)/i.test(s))r.push('links or email addresses');if(/\+?\d[\d\s().-]{8,}\d/.test(s))r.push('phone numbers');return r};
+function check(v,ids){
+ const r=[],P_=(k,m)=>{r.push(m);$(ids[k]).classList.add('bad')};
+ const OK=/^[A-Za-z0-9 .,'’&:;!?()\-\n]+$/,caps=s=>{const l=s.replace(/[^A-Za-z]/g,'');return l.length>8&&l.replace(/[^A-Z]/g,'').length/l.length>.6};
+ [['title','Event name',5,60],['place','Location',3,80],['desc','Description',30,300]].forEach(([k,n,lo,hi])=>{
+  const s=v[k];if(!s)return;
+  if(s.length<lo||s.length>hi)P_(k,T('{n} must be {lo} to {hi} characters (now {c}).',{n:tr(n),lo,hi,c:s.length}));
+  if(!OK.test(s))P_(k,T('{n} can only use letters, numbers and basic punctuation. No emoji, symbols or $ signs.',{n:tr(n)}));
+  if(caps(s))P_(k,T('{n} can’t be written in all capital letters.',{n:tr(n)}));
+  if(/(.)\1{3,}/.test(s)||(s.match(/!/g)||[]).length>1)P_(k,T('{n} has repeated characters or too many exclamation marks.',{n:tr(n)}));
+  const b=textBad(s);if(b.length)P_(k,T('{n} can’t include {w}.',{n:tr(n),w:b.map(tr).join(' / ')}));
+ });
+ if(v.date){const t=new Date().toLocaleDateString('en-CA'),mx=new Date(Date.now()+365*864e5).toLocaleDateString('en-CA');if((v.date<t||v.date>mx)&&!(editing&&v.date===(events.find(x=>x.id===editing)||{}).date))P_('date',tr('Date must be today or within the next year.'))}
+ if(v.time&&(v.time<'07:00'||v.time>'21:00'))P_('time',tr('Start time must be between 7:00 AM and 9:00 PM.'));
+ {const orig=editing?events.find(x=>x.id===editing):null;if(v.date&&v.time&&!(orig&&orig.date===v.date&&orig.time===v.time)&&new Date(v.date+'T'+v.time+':00').getTime()+OCC_H*36e5<=Date.now())P_('time',tr('That date and time have already passed.'))}
+ if(v.spots&&(v.spots>100||v.spots!==Math.floor(v.spots)))P_('spots',tr('Spots must be a whole number from 1 to 100.'));
+ if(v.url&&!okUrl(v.url))P_('url',tr('That link isn’t allowed. Use a montgomeryparks.org, montgomerycountymd.gov or ActiveMONTGOMERY link.'));
+ return r;
+}
+
+/* ---------- Feed ---------- */
+function renderFilters(){
+ $('filters').innerHTML=['All',...HOODS].map(h=>`<button class="chip" data-h="${h}" aria-pressed="${h===hood}">${h==='All'?tr('Anywhere nearby'):h}<small>${h==='All'?live().length:live().filter(e=>e.hood===h).length}</small></button>`).join('');
+ $('hot').innerHTML=FLAME+tr('Hot events');$('hot').setAttribute('aria-pressed',hot);$('accf').setAttribute('aria-pressed',accOnly);$('cats').innerHTML=['All',...CATS].map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===cat}">${c==='All'?tr('All types'):tr(c)}</button>`).join('');$('dates').innerHTML=DW.map(([k,l])=>`<button class="chip" data-dw="${k}" aria-pressed="${k===dw}">${tr(l)}</button>`).join('');
+}
+function card(e){
+ const oc=occOf(e.id),on=reserved.has(oc),wl=waitlisted.has(oc),g=going(e),left=Math.max(0,e.spots-takenId(e.id)),d=dp(e.date),rep=reports.some(r=>r.id===e.id);
+ return `<article class="card ev"><div class="date"><span>${d.m}</span><b>${d.d}</b><span>${d.w}</span></div><div>
+  ${g>=HOT?'<span class="tag">HOT</span>':''}
+  <h3 lang="en">${esc(e.title)}</h3>
+  <p class="meta">EVT-${String(e.id).padStart(3,'0')} / ${tm(e.time)} / ${esc(e.hood).toUpperCase()}</p>
+  ${e.reps?`<p class="muted" style="font-size:1.0625rem">${T('Repeats weekly through {d}',{d:fmtD(lastD(e))})}</p>`:''}
+  <p lang="en">${esc(e.place)}</p><p class="muted mt-1" lang="en">${esc(e.desc)}</p><div class="row mt-2" style="gap:8px">${e.reps?`<span class="tag">${esc(tr('Weekly')).toUpperCase()}</span>`:''}${e.cat?`<span class="tag" style="border-color:var(--line2);color:var(--muted)">${esc(tr(e.cat)).toUpperCase()}</span>`:''}${(e.acc||[]).map(a=>`<span class="tag" style="border-color:var(--ok);color:var(--ok)">${esc(tr(a)).toUpperCase()}</span>`).join('')}</div>
+  <div class="bar"><i style="width:${Math.round(100*g/(g+left||1))}%"></i></div>
+  <p class="cap"><b>${g}</b> ${tr('going')} / <b>${left}</b> ${tr(left===1?'spot left':'spots left')}</p>
+  <button class="btn ${on||wl?'done':left<=0?'alt':''}" data-sign="${e.id}" ${on||wl?'disabled':''}>${tr(on?'Spot reserved ✓':wl?'On the waitlist ✓':left<=0?'Join waitlist':'Sign up')}<span class="sr"> – ${esc(e.title)}</span></button>
+  <div class="row mt-2">${on||wl?`<button class="link" data-cancel="${e.id}">${tr(on?'Cancel my spot':'Leave waitlist')}</button>`:''}<a class="link" style="display:inline-flex;align-items:center" target="_blank" rel="noopener" href="${esc(calUrl(e))}">${tr('Add to calendar')}<span class="sr"> – ${esc(e.title)}</span></a><a class="link" style="display:inline-flex;align-items:center" target="_blank" rel="noopener" href="${esc('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e.place+', '+e.hood+', MD'))}">${tr('Directions')}<span class="sr"> – ${esc(e.title)}</span></a><button class="link" data-share="${e.id}">${tr('Share')}<span class="sr"> – ${esc(e.title)}</span></button>${e.url?`<a class="link" style="display:inline-flex;align-items:center" target="_blank" rel="noopener" href="${esc(e.url)}">${tr('Register on the official site')}<span class="sr"> – ${esc(e.title)}</span></a>`:''}${canEdit(e)?`<button class="link" data-msg="${e.id}">${tr('Message attendees')}</button><button class="link" data-edit="${e.id}">${tr('Edit')}</button><button class="link" data-del="${e.id}">${tr(delAsk===e.id?'Tap again to confirm':'Cancel event')}</button>`:''}${rep?'<span class="muted">Reported</span>':`<button class="link" data-report="${e.id}">${tr('Report')}<span class="sr"> – ${esc(e.title)}</span></button>`}</div>
+ </div></article>`;
+}
+function renderFeed(){
+ const list=live().filter(e=>(one===null||e.id===one)&&(hood==='All'||e.hood===hood)&&(!hot||going(e)>=HOT)&&(cat==='All'||e.cat===cat)&&(!accOnly||(e.acc||[]).includes('Wheelchair accessible'))&&dwOk(e)&&(!sq||(e.title+' '+e.place+' '+e.desc+' '+e.hood).toLowerCase().includes(sq))).sort(hot?(a,b)=>going(b)-going(a):(a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+ $('count').textContent=list.length?T(list.length===1?'{n} upcoming event{h}{o}':'{n} upcoming events{h}{o}',{n:list.length,h:hood==='All'?'':' / '+hood,o:hot?' / '+tr('hot only'):''}):'';
+ $('feed').innerHTML=list.length?list.map(card).join(''):`<div class="card text-center"><h3>${hot?'No hot events here right now':'No events here yet'}</h3><p class="muted mt-2">${hot?'Turn off Hot events or try another neighborhood.':'Try another neighborhood, or add one in Create.'}</p></div>`;
+}
+$('filters').onclick=e=>{const b=e.target.closest('[data-h]');if(b){hood=b.dataset.h;renderFilters();renderFeed()}};
+$('hot').onclick=()=>{hot=!hot;renderFilters();renderFeed()};
+$('feed').onclick=e=>{
+ const s=e.target.closest('[data-sign]'),c=e.target.closest('[data-cancel]'),r=e.target.closest('[data-report]');
+ if(s)openSU(+s.dataset.sign);
+ if(c){const id=+c.dataset.cancel,oc=occOf(id),d=oc.split('@')[1],mine=x=>x.id===id&&x.d===d;if(reserved.delete(oc)){signups=signups.filter(x=>!mine(x));toast('Your spot was canceled.')}else{waitlisted.delete(oc);signups=signups.filter(x=>!mine(x));toast('You left the waitlist.')}renderFilters();renderFeed()}
+ if(r){const id=+r.dataset.report;reports.push({kind:'event',id,t:events.find(x=>x.id===id).title});renderFeed();toast('Thank you. Parks staff will review this event.')}
+};
+
+/* ---------- Views ---------- */
+function sync(){$('t-staff').hidden=!isAdmin()}
+function setView(v){
+ if(v==='staff'&&!isAdmin())v='feed';view=v;
+ ['feed','mgr','mine','staff'].forEach(k=>{$('v-'+k).hidden=k!==v;(k===v?$('t-'+k).setAttribute('aria-current','page'):$('t-'+k).removeAttribute('aria-current'))});
+ 
+ if(v==='staff')renderStaff();if(v==='mine')renderMine();
+ scrollTo({top:0});
+ document.title=tr({feed:'Events',mgr:'Create',mine:'My events',staff:'Admin'}[v])+' - mocosignup.app';
+ focusHeading();
+}
+function focusHeading(){const h=document.querySelector('#v-'+view+' h2');if(h&&!h.closest('[inert]')){h.tabIndex=-1;h.focus({preventScroll:true})}}
+document.querySelector('.tabs').onclick=e=>{const t=e.target.closest('[data-v]');if(t){if(t.dataset.v==='mgr'&&editing)cancelEdit();setView(t.dataset.v)}};
+document.addEventListener('click',e=>{
+ const c=e.target.closest('[data-close]');if(c)$(c.dataset.close).hidden=true;
+ if(e.target.classList.contains('ov'))e.target.hidden=true;
+ const i=e.target.closest('[data-info]');if(i){const k=i.dataset.info,x=['es','zh','fr','ko'].indexOf(lang),g=s=>x<0?null:(TR[s]||[])[x];$('info-t').textContent=g('i.'+k+'.t')||INFO[k][0];$('info-b').textContent=g('i.'+k+'.b')||INFO[k][1];show('m-info')}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.ov').forEach(o=>o.hidden=true);$('toast').hidden=true}});
+const INFO={
+ help:['Need a hand?','Call (301) 555-0142 (sample number), weekdays 9 to 4, or email help@mocosignup.app (sample address). We’ll walk you through signing up, step by step.'],
+ privacy:['Your privacy','Browsing, signing up and posting need no account. Members who log in can add a profile, which is saved only on their own device. We never sell your information.'],
+ terms:['Community rules','Be kind, keep events free and honest, and don’t post scams, links or personal contact details. Staff may remove anything that breaks these rules. mocosignup.app is independent and is not run by Montgomery County, Montgomery Parks or M-NCPPC.'],
+ access:['Accessibility','Designed for large text, strong contrast, big buttons and keyboard use. We are working toward WCAG 2.2 AA and a formal audit is still to come. If something is hard to use, tell us through Help.']
+};
+
+/* ---------- Celebration ---------- */
+function confetti(){
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ const c=$('confetti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+ const cols=['#4d9fff','#ffc24b','#ffffff','#5fd39a','#4cc9f0','#e5738a'];
+ const A=Array.from({length:160},()=>{const a=Math.random()*Math.PI*2,s=6+Math.random()*11;return{x:innerWidth/2,y:innerHeight*.4,vx:Math.cos(a)*s,vy:Math.sin(a)*s-7,w:8+Math.random()*8,h:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[Math.random()*cols.length|0]}});
+ let t=0;(function f(){x.clearRect(0,0,c.width,c.height);t++;A.forEach(p=>{p.vy+=.28;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()});if(t<220)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})();
+}
+function celebrate(t,s){$('cel-ok').textContent=tr('Done');$('cel-t').textContent=tr(t);$('cel-s').textContent=tr(s);const sh=$('m-cel').firstElementChild;sh.style.animation='none';sh.offsetWidth;sh.style.animation='';show('m-cel');$('cel-ok').focus();confetti()}
+
+/* ---------- Create event ---------- */
+$('f-hood').innerHTML+=HOODS.map(h=>`<option>${h}</option>`).join('');
+[['f-title',60],['f-place',80],['f-desc',300]].forEach(([i,n])=>$(i).maxLength=n);
+$('f-date').min=new Date().toLocaleDateString('en-CA');
+$('f-new').onsubmit=ev=>{
+ ev.preventDefault();
+ if(!editing&&!isAdmin()){const w=Math.ceil((300000-(Date.now()-lastPost))/1000);if(w>0){$('warn').textContent=T('You can post one event every 5 minutes. Please try again in {t}.',{t:Math.floor(w/60)+':'+String(w%60).padStart(2,'0')});$('warn').hidden=false;$('warn').scrollIntoView({block:'center',behavior:'smooth'});return}}
+ const ids={url:'f-url',title:'f-title',hood:'f-hood',cat:'f-cat',date:'f-date',time:'f-time',place:'f-place',spots:'f-spots',desc:'f-desc'};
+ const v={title:$('f-title').value.trim(),hood:$('f-hood').value,cat:$('f-cat').value,url:$('f-url').value.trim(),acc:[...document.querySelectorAll('#f-acc input:checked')].map(i=>i.value),date:$('f-date').value,time:$('f-time').value,place:$('f-place').value.trim(),spots:parseInt($('f-spots').value,10),desc:$('f-desc').value.trim()};
+ Object.values(ids).forEach(i=>{$(i).classList.remove('bad');$(i).removeAttribute('aria-invalid')});$('warn').hidden=true;
+ const blank=Object.keys(ids).filter(k=>k!=='url'&&(k==='spots'?!(v.spots>0):!v[k]));
+ const hit=findRestricted(v.title+' '+v.place+' '+v.desc),probs=check(v,ids);
+ if(blank.length||hit.length||probs.length){
+  blank.forEach(k=>$(ids[k]).classList.add('bad'));
+  let m=blank.length?tr('Please fill in every field before publishing.')+' ':'';
+  if(hit.length)m+=T('Your event uses words that are not allowed: {w}. Please reword it.',{w:'“'+hit.map(tr).join('”, “')+'”'});
+  $('warn').innerHTML=esc(m.trim()||tr('Please fix the following:'))+(probs.length?'<ul class="mt-2 pl-6 list-disc font-normal">'+probs.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>':'');
+  Object.values(ids).forEach(i=>$(i).setAttribute('aria-invalid',$(i).classList.contains('bad')));$('warn').hidden=false;$('warn').tabIndex=-1;$('warn').focus();return;
+ }
+ if(!editing){if(Date.now()<busyUntil)return;busyUntil=Date.now()+1500}
+ const ok=isAdmin();
+ if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}Object.assign(ev0,v,{ok,reps:Math.max(0,Math.min(10,+$('f-rep').value||0))});cancelEdit();renderFilters();renderFeed();setView('feed');celebrate('Event updated!',ok?'Your changes are live.':'Parks staff will review your changes before the event shows again.');return}
+ if(!ok){lastPost=Date.now();try{localStorage.setItem('moco-last',lastPost)}catch(_){}}
+  events.push({id:nextId++,...v,reps:Math.max(0,Math.min(10,+$('f-rep').value||0)),by:user?user.name:'Guest',owner:user?user.k:'g-'+me,at:Date.now(),ok});
+ $('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
+ celebrate('You’ve made an event!',ok?'It’s live in the feed now.':'Parks staff review new events first, so it will appear in the feed once approved.');
+};
+
+/* ---------- Avatars ---------- */
+const avSVG=(n,c,s,photo)=>photo?`<img class="avatar" src="${photo}" alt="" style="width:${s}px;height:${s}px">`:`<span class="avatar" style="width:${s}px;height:${s}px;background:${COLORS[c]}">${esc(n[0])}</span>`;
+
+/* ---------- Admin ---------- */
+function renderStaff(){
+ const L=live(),q=events.filter(e=>e.ok===false),tot=L.reduce((n,e)=>n+going(e),0),top=[...L].sort((a,b)=>going(b)-going(a))[0],mx=Math.max(1,...HOODS.map(h=>L.filter(e=>e.hood===h).reduce((n,e)=>n+going(e),0)));
+ const st=(n,l)=>`<div class="stat"><b>${n}</b><span class="muted">${l}</span></div>`,H=t=>`<p class="kicker mt-10 mb-4">${t}</p>`;
+ $('staff').innerHTML=`<div class="stats">${st(L.length,'Live events')}${st(tot,'Total sign-ups')}${st(q.length,'Awaiting review')}${st(reports.length,'Open reports')}</div>
+ <p class="mt-4 muted"><span>Most popular:</span> <b style="color:var(--text)">${top?esc(top.title):'None yet'}</b> <span>Sign-up counts are sample data.</span></p>
+ ${H('Sign-ups by neighborhood')}${HOODS.map(h=>{const n=L.filter(e=>e.hood===h).reduce((a,e)=>a+going(e),0);return `<div class="mt-3"><div class="row" style="justify-content:space-between"><span>${h}</span><b class="mono">${n}</b></div><div class="bar" style="margin-top:6px"><i style="width:${100*n/mx}%"></i></div></div>`}).join('')}
+ ${extra(L,q)}${H('Review queue')}${q.length?q.map(e=>`<div class="card mb-4"><h3 lang="en">${esc(e.title)}</h3><p class="muted">${esc(e.hood)}, ${fmtD(e.date)} at ${tm(e.time)}<br>${esc(e.place)}. <span>Posted by</span> ${esc(e.by||'unknown')}</p><p class="mt-3">${esc(e.desc)}</p><div class="row mt-4"><button class="btn" style="flex:1;min-height:56px;font-size:1.25rem;width:auto" data-ap="${e.id}">Approve</button><button class="chip" data-rj="${e.id}">Reject</button></div></div>`).join(''):'<p class="muted">Nothing is waiting for review.</p>'}
+ ${H('Reports')}${reports.length?reports.map((r,i)=>`<div class="card mb-4"><p><b>${esc(r.t)}</b></p><p class="muted">${r.kind==='event'?'Event reported by a neighbor':'Profile reported by a neighbor'}</p><div class="row mt-3">${r.kind==='event'?`<button class="chip" data-rm="${i}">Remove event</button>`:''}<button class="chip" data-dis="${i}">Dismiss</button></div></div>`).join(''):'<p class="muted">No open reports.</p>'}
+ ${H('Sign-up export')}<p class="muted mb-4">Totals per event, plus a list of names and contacts from sign-ups made in this browser.</p><button class="btn" id="csv">Copy sign-up CSV</button><button class="btn alt mt-3" id="csv2">Copy attendee list</button><textarea id="csv-out" aria-label="${tr('Sign-up export')}" class="field mt-4" rows="6" readonly hidden></textarea>`;
+}
+$('staff').onclick=e=>{
+ if(!isAdmin())return;
+ const T=s=>e.target.closest(s);let c;
+ if(c=T('[data-ap]')){events.find(x=>x.id===+c.dataset.ap).ok=true;toast('Approved. The event is now in the feed.')}
+ else if(c=T('[data-rj]')){events=events.filter(x=>x.id!==+c.dataset.rj);toast('Event rejected.')}
+ else if(c=T('[data-rm]')){const i=+c.dataset.rm,r=reports[i];events=events.filter(x=>x.id!==r.id);reports.splice(i,1);toast('Event removed.')}
+ else if(c=T('[data-dis]')){reports.splice(+c.dataset.dis,1)}
+ else if(T('#rp-copy')){copyCsv(monthRows(rpm));return}
+ else if(T('#imp-go')){importRows();return}
+ else if(T('#csv2')){copyCsv([['Event','Name','Contact','Status','Date'],...signups.map(s=>[(events.find(x=>x.id===s.id)||{}).title||'',s.n,s.c,s.wl?'Waitlist':'Reserved',s.d||''])]);return}
+ else if(T('#csv')){
+  const rows=[['Event','Neighborhood','Date','Time','Location','Spots','Signed up'],...live().map(x=>[x.title,x.hood,x.date,x.time,x.place,x.spots,going(x)])];
+  const t=rows.map(r=>r.map(v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')).join('\n');
+  $('csv-out').value=t;$('csv-out').hidden=false;
+  try{navigator.clipboard.writeText(t).then(()=>toast('Copied to your clipboard.'),()=>toast('Select the text below to copy it.'))}catch(_){toast('Select the text below to copy it.')}
+  return;
+ }else return;
+ renderStaff();renderFilters();renderFeed();
+};
+
+/* ---------- Login and profile ---------- */
+const newP=()=>({bio:'',color:0,photo:null,hobbies:[],groups:[],opts:{hobbies:[...HOBBIES],groups:[...GROUPS]},show:false,hood:'Rockville'});
+function loadP(k){let p=null;try{p=JSON.parse(localStorage.getItem('moco-p-'+k))}catch(_){}
+ if(!p||typeof p!=='object'||!p.opts)return newP();
+ const arr=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'&&x.length<=24).slice(0,20):[];
+ return{bio:typeof p.bio==='string'?p.bio.slice(0,160):'',color:Number.isInteger(p.color)&&p.color>=0&&p.color<COLORS.length?p.color:0,photo:typeof p.photo==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.photo)?p.photo:null,hobbies:arr(p.hobbies),groups:arr(p.groups),opts:{hobbies:arr(p.opts.hobbies),groups:arr(p.opts.groups)},show:false,hood:'Rockville'}}
+function saveP(){if(user&&P)try{localStorage.setItem('moco-p-'+user.k,JSON.stringify(P))}catch(_){}}
+function loginAs(k){user={k,name:USERS[k].name,role:USERS[k].role};P=loadP(k);events.forEach(e=>{if(e.owner==='g-'+me)e.owner=k});try{localStorage.setItem('moco-user',k)}catch(_){}sync()}
+function logout(){user=P=null;try{localStorage.removeItem('moco-user')}catch(_){}sync();if(view==='staff')setView('feed');if(view==='mine')renderMine();renderSettings()}
+let tries=0,lock=0;
+$('lg-show').onchange=e=>{$('lg-p').type=e.target.checked?'text':'password'};
+$('f-login').onsubmit=e=>{
+ e.preventDefault();const err=m=>{['lg-u','lg-p'].forEach(i=>$(i).setAttribute('aria-invalid','true'));$('lg-err').textContent=tr(m);$('lg-err').hidden=false};
+ if(Date.now()<lock)return err('Too many tries. Wait 30 seconds and try again.');
+ const k=$('lg-u').value.trim().toLowerCase(),u=USERS[k];
+ if(!u||u.pw!==$('lg-p').value){if(++tries>=5){lock=Date.now()+3e4;tries=0}return err('That username or password isn’t right.')}
+ $('lg-show').checked=false;$('lg-p').type='password';tries=0;['lg-u','lg-p'].forEach(i=>$(i).removeAttribute('aria-invalid'));$('lg-p').value='';$('lg-u').value='';$('lg-err').hidden=true;loginAs(k);if(view==='mine')renderMine();$('m-login').hidden=true;
+ if(u.role==='admin'){setView('staff');toast('Logged in. Admin tools unlocked.')}else toast('Welcome back, '+u.name+'.');
+};
+$('cog').onclick=()=>{renderSettings();show('m-set')};
+const chips=(l,sel,k)=>l.map(x=>`<button type="button" class="chip" data-k="${k}" data-v="${esc(x)}" aria-pressed="${sel.includes(x)}">${esc(x)}</button>`).join('');
+const addRow=k=>`<div class="row mt-3" style="flex-wrap:nowrap"><input class="field" id="s-new-${k}" maxlength="24" placeholder="${tr('Add your own')}" aria-label="${tr('Add your own')}: ${tr(k==='hobbies'?'Hobbies':'Groups')}"><button type="button" class="chip" data-add="${k}">Add</button></div>`;
+function renderSettings(){
+ const light=document.documentElement.dataset.theme==='light';
+ let h=`<div class="row" style="justify-content:space-between"><h2>${tr('Settings')}</h2><button class="chip" data-close="m-set">${tr('Close')}</button></div>
+ <button class="chip" id="s-theme" style="width:100%;justify-content:center">${tr(light?'Switch to dark mode':'Switch to light mode')}</button>
+ <button class="chip" id="s-langs" aria-expanded="${langOpen}" style="width:100%;justify-content:space-between"><span>${tr('Languages')}</span><span class="mono">${LANGS[lang]} ${langOpen?'▲':'▼'}</span></button>${langOpen?`<div class="row">${Object.keys(LANGS).map(k=>`<button class="chip" data-lang="${k}" lang="${k}" aria-pressed="${k===lang}">${LANGS[k]}</button>`).join('')}</div>`:''}`;
+ if(!user)h+=`<div class="card"><p class="kicker">Account</p><p class="mt-2">Log in to add a profile picture, bio, hobbies and groups.</p><button class="btn mt-4" id="s-login">Log in</button></div>`;
+ else h+=`<div class="row" style="flex-wrap:nowrap;gap:16px">${avSVG(user.name,P.color,64,P.photo)}<div><h3>${esc(user.name)}</h3><p class="meta" style="margin:0">${user.role==='admin'?'ADMIN':'MEMBER'}</p></div></div>
+ <div><p class="lab">Profile picture</p><div class="row">${COLORS.map((c,i)=>`<button class="sw" data-c="${i}" style="background:${c}" aria-label="${tr('Color')} ${i+1}" aria-pressed="${!P.photo&&P.color===i}"></button>`).join('')}<button class="chip" id="s-up">Upload image</button></div><input type="file" id="s-file" accept="image/*" hidden></div>
+ <div><label for="s-bio">Bio</label><textarea class="field" id="s-bio" rows="3" maxlength="160" placeholder="Tell your neighbors a little about you">${esc(P.bio)}</textarea></div>
+ <div><p class="lab">Hobbies</p><div class="row">${chips(P.opts.hobbies,P.hobbies,'hobbies')}</div>${addRow('hobbies')}</div>
+ <div><p class="lab">Groups</p><div class="row">${chips(P.opts.groups,P.groups,'groups')}</div>${addRow('groups')}</div>
+ <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-save">Save profile</button><button class="btn alt" id="s-out">Log out</button>`;
+ $('set-body').innerHTML=h;
+}
+const setMsg=(t,bad)=>{const m=$('s-msg');if(m){m.style.color=bad?'var(--warn)':'var(--ok)';m.textContent=tr(t)}};
+function readPhoto(f){
+ if(!f)return;
+ if(!/^image\/(png|jpe?g|webp|gif)$/.test(f.type))return setMsg('Please choose a PNG, JPG, WEBP or GIF image.',1);
+ if(f.size>5e6)return setMsg('That image is over 5 MB. Please pick a smaller one.',1);
+ const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas'),s=Math.min(i.width,i.height);c.width=c.height=192;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,192,192);P.photo=c.toDataURL('image/jpeg',.85);saveP();renderSettings()};i.onerror=()=>setMsg('That file couldn’t be read as an image.',1);i.src=r.result};r.readAsDataURL(f);
+}
+function addOwn(k){
+ const s=$('s-new-'+k).value.trim().replace(/\s+/g,' '),o=P.opts[k],b=[];
+ if(o.length>=20)return setMsg('This list is full. The limit is 20 items.',1);
+ if(s.length<2||s.length>24)b.push('must be 2 to 24 characters');
+ if(!/^[A-Za-z0-9 &'’-]*$/.test(s))b.push('can only use letters, numbers and basic punctuation');
+ if(/(.)\1{3,}/.test(s))b.push('has too many repeated letters');
+ if(textBad(s).length||findRestricted(s).length)b.push('includes words, links or numbers that aren’t allowed');
+ if(o.some(x=>x.toLowerCase()===s.toLowerCase()))b.push('is already in the list');
+ if(b.length)return setMsg(T('That entry {r}.',{r:b.map(tr).join(', ')}),1);
+ o.push(s);P[k].push(s);saveP();renderSettings();
+}
+const sb=$('set-body');
+sb.addEventListener('input',e=>{if(e.target.id==='s-bio'){P.bio=e.target.value;saveP()}});
+sb.addEventListener('change',e=>{if(e.target.id==='s-file')readPhoto(e.target.files[0]);});
+sb.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id.startsWith('s-new-')){e.preventDefault();addOwn(e.target.id.slice(6))}});
+sb.addEventListener('click',e=>{
+ const T=s=>e.target.closest(s);
+ if(T('#s-theme')){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='light'?'dark':'light';try{localStorage.setItem('moco-theme',d.dataset.theme)}catch(_){}return renderSettings()}
+ if(T('#s-login')){$('m-set').hidden=true;$('lg-err').hidden=true;show('m-login');return}
+ if(T('#s-out')){$('m-set').hidden=true;return logout()}
+ if(!P)return;
+ if(T('#s-up'))return $('s-file').click();
+ const sw=T('[data-c]');if(sw){P.color=+sw.dataset.c;P.photo=null;saveP();return renderSettings()}
+ const c=T('[data-k]');
+ if(c){const l=P[c.dataset.k],v=c.dataset.v,i=l.indexOf(v);i<0?l.push(v):l.splice(i,1);saveP();return renderSettings()}
+ const ad=T('[data-add]');if(ad)return addOwn(ad.dataset.add);
+ if(T('#s-save')){
+  const b=[.../[^\x20-\x7E\n’]/.test(P.bio)?['unusual characters or emoji']:[],...textBad(P.bio),...findRestricted(P.bio).map(w=>'“'+tr(w)+'”')];
+  if(!b.length)saveP();
+  setMsg(b.length?T('Your bio can’t include {w}.',{w:b.map(tr).join(' / ')}):'Profile saved ✓',b.length);
+ }
+});
+
+/* ---------- Search, calendar, sign-up details, organizer tools ---------- */
+const me=(()=>{try{let i=localStorage.getItem('moco-id');if(!i){i=Math.random().toString(36).slice(2);localStorage.setItem('moco-id',i)}return i}catch(_){return 'x'}})();
+const digits=s=>String(s).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
+const canEdit=e=>isAdmin()||(e.owner&&e.owner===(user?user.k:'g-'+me));
+const calUrl=e=>{const d=e.date.replace(/-/g,''),en=String(Math.min(+e.time.slice(0,2)+2,23)).padStart(2,'0')+e.time.slice(3,5);return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(e.title)+'&dates='+d+'T'+e.time.replace(':','')+'00/'+d+'T'+en+'00&location='+encodeURIComponent(e.place+', '+e.hood+', MD')+'&details='+encodeURIComponent(e.desc)};
+function copyCsv(rows){const t=rows.map(r=>r.map(v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')).join('\n');$('csv-out').value=t;$('csv-out').hidden=false;try{navigator.clipboard.writeText(t).then(()=>toast('Copied to your clipboard.'),()=>toast('Select the text below to copy it.'))}catch(_){toast('Select the text below to copy it.')}}
+$('q').oninput=()=>{sq=$('q').value.trim().toLowerCase();renderFeed()};
+function openSU(id){
+ const e=events.find(x=>x.id===id);if(!e||!cur(e)){toast('That event is no longer available.');return}const full=e.spots-takenId(id)<=0;suId=id;
+ $('su-t').textContent=tr(full?'Join the waitlist for':'Reserve a spot for')+' '+e.title;$('su-b').textContent=tr(full?'Join waitlist':'Reserve my spot');
+ $('su-n').value=contact?contact.n:(user?user.name:'');$('su-c').value=contact?contact.c:'';$('su-err').hidden=true;show('m-su');$('su-n').focus();
+}
+$('f-su').onsubmit=ev=>{
+ ev.preventDefault();
+ const n=$('su-n').value.trim(),c=$('su-c').value.trim(),er=[],d=digits(c);
+ if(!/^[A-Za-z][A-Za-z .'’-]{1,39}$/.test(n)||findRestricted(n).length)er.push(tr('Enter your name using letters only (2 to 40 characters).'));
+ if(!/^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(c))er.push(tr('Enter a valid email address, like name@example.com.'));
+ if(er.length){$('su-n').setAttribute('aria-invalid',er.includes(tr('Enter your name using letters only (2 to 40 characters).')));$('su-c').setAttribute('aria-invalid',er.includes(tr('Enter a valid email address, like name@example.com.')));$('su-err').innerHTML=er.map(esc).join('<br>');$('su-err').hidden=false;return}
+ $('su-n').removeAttribute('aria-invalid');$('su-c').removeAttribute('aria-invalid');
+ contact={n,c};try{localStorage.setItem('moco-contact',JSON.stringify(contact))}catch(_){}
+ const e=events.find(x=>x.id===suId);$('m-su').hidden=true;
+ if(!e||!cur(e)){toast('That event is no longer available.');return}
+ if(reserved.has(occOf(e.id))||waitlisted.has(occOf(e.id)))return;
+ if(e.spots-takenId(e.id)<=0){waitlisted.add(occOf(e.id));signups.push({id:e.id,n,c,wl:1,t:Date.now(),d:(cur(e)||{}).date});renderFeed();toast('You’re on the waitlist for this event.')}
+ else{reserved.add(occOf(e.id));signups.push({id:e.id,n,c,t:Date.now(),d:(cur(e)||{}).date});renderFilters();renderFeed();celebrate(tr('You’re signed up!'),tr('Your spot is reserved for')+' “'+e.title+'”')}
+};
+$('feed').addEventListener('click',e=>{
+ const ed=e.target.closest('[data-edit]'),dl=e.target.closest('[data-del]');
+ if(ed)startEdit(+ed.dataset.edit);
+ if(dl)delClick(+dl.dataset.del);
+});
+try{contact=JSON.parse(localStorage.getItem('moco-contact'))}catch(_){}
+try{lastPost=+localStorage.getItem('moco-last')||0}catch(_){}
+
+/* ---------- Languages ---------- */
+const LANGS={en:'English',es:'Español',zh:'中文',fr:'Français',ko:'한국어'};
+const TR={"Cancel editing":["Cancelar edición", "取消编辑", "Annuler la modification", "수정 취소"],"That event no longer exists.":["Ese evento ya no existe.", "该活动已不存在。", "Cet événement n’existe plus.", "이 행사는 더 이상 존재하지 않습니다."],"That event is no longer available.":["Ese evento ya no está disponible.", "该活动已不再提供。", "Cet événement n’est plus disponible.", "이 행사는 더 이상 이용할 수 없습니다."],"That date and time have already passed.":["Esa fecha y hora ya pasaron.", "该日期和时间已经过去。", "Cette date et cette heure sont déjà passées.", "해당 날짜와 시간은 이미 지났습니다."],"Sign-ups":["Inscripciones", "报名", "Inscriptions", "신청"],"No sign-ups yet.":["Aún no hay inscripciones.", "暂无报名。", "Aucune inscription pour l’instant.", "아직 신청이 없습니다."],"Waitlist":["Lista de espera", "候补", "Liste d’attente", "대기자"],"Only sign-ups made in this browser are shown in this prototype.":["En este prototipo solo se muestran las inscripciones hechas en este navegador.", "此原型仅显示在此浏览器中完成的报名。", "Dans ce prototype, seules les inscriptions faites dans ce navigateur sont affichées.", "이 프로토타입에서는 이 브라우저에서 한 신청만 표시됩니다."],"Sample sign-up counts have no names.":["Las cifras de inscripción de muestra no tienen nombres.", "示例报名数量没有姓名。", "Les chiffres d’inscription d’exemple n’ont pas de noms.", "예시 신청 수에는 이름이 없습니다."],"Attendee list copied.":["Lista de asistentes copiada.", "参加者名单已复制。", "Liste des participants copiée.", "참가자 명단이 복사되었습니다."],"Events / sign-ups":["Eventos / inscripciones", "活动 / 报名", "Événements / inscriptions", "행사 / 신청"],"My events":["Mis eventos", "我的活动", "Mes événements", "내 행사"],"Share":["Compartir", "分享", "Partager", "공유"],"Link copied.":["Enlace copiado.", "链接已复制。", "Lien copié.", "링크가 복사되었습니다."],"Print list":["Imprimir lista", "打印列表", "Imprimer la liste", "목록 인쇄"],"You’re offline. Some features may not work.":["Sin conexión. Algunas funciones pueden no funcionar.", "您已离线，部分功能可能无法使用。", "Vous êtes hors ligne. Certaines fonctions peuvent ne pas marcher.", "오프라인입니다. 일부 기능이 작동하지 않을 수 있습니다."],"Something went wrong. Please refresh the page.":["Algo salió mal. Actualice la página.", "出了点问题，请刷新页面。", "Un problème est survenu. Veuillez actualiser la page.", "문제가 발생했습니다. 페이지를 새로고침해 주세요."],"Showing one shared event.":["Mostrando un evento compartido.", "正在显示一个分享的活动。", "Affichage d’un événement partagé.", "공유된 행사 하나를 보여 주고 있습니다."],"Show all events":["Mostrar todos los eventos", "显示所有活动", "Afficher tous les événements", "모든 행사 보기"],"Loading events…":["Cargando eventos…", "正在加载活动…", "Chargement des événements…", "행사를 불러오는 중…"],"Weekly for 1 more week":["Cada semana, 1 semana más", "每周一次，再重复1周", "Chaque semaine, 1 semaine de plus", "매주, 1주 더"],"Weekly for {n} more weeks":["Cada semana, {n} semanas más", "每周一次，再重复{n}周", "Chaque semaine, {n} semaines de plus", "매주, {n}주 더"],"Repeats weekly through {d}":["Se repite cada semana hasta el {d}", "每周重复，直至{d}", "Se répète chaque semaine jusqu’au {d}", "{d}까지 매주 반복"],"Pending review":["En revisión", "审核中", "En cours de révision", "검토 중"],"Live":["Activo", "已上线", "En ligne", "게시 중"],"Ended":["Finalizado", "已结束", "Terminé", "종료됨"],"You haven’t posted any events yet.":["Aún no ha publicado eventos.", "您还没有发布过活动。", "Vous n’avez pas encore publié d’événement.", "아직 올린 행사가 없습니다."],"Events you posted, including ones waiting for review.":["Los eventos que publicó, incluidos los que esperan revisión.", "您发布的活动，包括正在等待审核的活动。", "Les événements que vous avez publiés, y compris ceux en attente de révision.", "내가 올린 행사입니다. 검토 대기 중인 행사도 포함됩니다."],"Organizer":["Organizador", "组织者", "Organisateur", "주최자"],"Official registration link (optional)":["Enlace oficial de inscripción (opcional)", "官方报名链接（可选）", "Lien officiel d’inscription (facultatif)", "공식 신청 링크(선택)"],"Register on the official site":["Inscribirse en el sitio oficial", "在官方网站报名", "S’inscrire sur le site officiel", "공식 사이트에서 신청"],"That link isn’t allowed. Use a montgomeryparks.org, montgomerycountymd.gov or ActiveMONTGOMERY link.":["Ese enlace no está permitido. Use un enlace de montgomeryparks.org, montgomerycountymd.gov o ActiveMONTGOMERY.", "不允许使用该链接。请使用 montgomeryparks.org、montgomerycountymd.gov 或 ActiveMONTGOMERY 的链接。", "Ce lien n’est pas autorisé. Utilisez un lien montgomeryparks.org, montgomerycountymd.gov ou ActiveMONTGOMERY.", "허용되지 않는 링크입니다. montgomeryparks.org, montgomerycountymd.gov 또는 ActiveMONTGOMERY 링크를 사용해 주세요."],"Monthly report":["Informe mensual", "月度报告", "Rapport mensuel", "월간 보고서"],"Month":["Mes", "月份", "Mois", "월"],"Events scheduled":["Eventos programados", "已安排的活动", "Événements prévus", "예정된 행사"],"Recorded sign-ups":["Inscripciones registradas", "已记录的报名", "Inscriptions enregistrées", "기록된 신청"],"Sample sign-ups (demo data)":["Inscripciones de muestra (datos de demostración)", "示例报名（演示数据）", "Inscriptions d’exemple (données de démonstration)", "예시 신청(데모 데이터)"],"Capacity (spots)":["Capacidad (cupos)", "容量（名额）", "Capacité (places)", "정원(자리)"],"Fill rate":["Ocupación", "报满率", "Taux de remplissage", "마감률"],"By category":["Por categoría", "按类别", "Par catégorie", "카테고리별"],"Top events":["Eventos principales", "热门活动排行", "Événements les plus suivis", "상위 행사"],"Copy monthly report":["Copiar informe mensual", "复制月度报告", "Copier le rapport mensuel", "월간 보고서 복사"],"No events scheduled this month.":["No hay eventos programados este mes.", "本月没有安排活动。", "Aucun événement prévu ce mois-ci.", "이번 달에 예정된 행사가 없습니다."],"Show password":["Mostrar contraseña", "显示密码", "Afficher le mot de passe", "비밀번호 표시"],"Color":["Color", "颜色", "Couleur", "색상"],"Sections":["Secciones", "栏目", "Sections", "메뉴"],"Add your own":["Añadir el suyo", "添加自己的", "Ajouter le vôtre", "직접 추가"],"Description":["Descripción", "描述", "Description", "설명"],"links or email addresses":["enlaces o correos electrónicos", "链接或电子邮箱", "liens ou adresses e-mail", "링크나 이메일 주소"],"phone numbers":["números de teléfono", "电话号码", "numéros de téléphone", "전화번호"],"unusual characters":["caracteres inusuales", "特殊字符", "caractères inhabituels", "특수 문자"],"unusual characters or emoji":["caracteres inusuales o emojis", "特殊字符或表情符号", "caractères inhabituels ou émojis", "특수 문자나 이모지"],"inappropriate language":["lenguaje inapropiado", "不当用语", "langage inapproprié", "부적절한 표현"],"{n} must be {lo} to {hi} characters (now {c}).":["{n} debe tener entre {lo} y {hi} caracteres (ahora {c}).", "{n}必须为{lo}到{hi}个字符（当前{c}个）。", "{n} doit contenir de {lo} à {hi} caractères (actuellement {c}).", "{n}은(는) {lo}~{hi}자여야 합니다(현재 {c}자)."],"{n} can only use letters, numbers and basic punctuation. No emoji, symbols or $ signs.":["{n} solo puede usar letras, números y signos de puntuación básicos. Sin emojis, símbolos ni signos $.", "{n}只能使用字母、数字和基本标点，不能含表情符号、特殊符号或 $ 符号。", "{n} ne peut contenir que des lettres, des chiffres et la ponctuation de base. Pas d’émojis, de symboles ni de signes $.", "{n}에는 영문자, 숫자, 기본 문장부호만 쓸 수 있습니다. 이모지, 기호, $ 표시는 쓸 수 없습니다."],"{n} can’t be written in all capital letters.":["{n} no puede escribirse todo en mayúsculas.", "{n}不能全部使用大写字母。", "{n} ne peut pas être écrit entièrement en majuscules.", "{n}은(는) 모두 대문자로 쓸 수 없습니다."],"{n} has repeated characters or too many exclamation marks.":["{n} tiene caracteres repetidos o demasiados signos de exclamación.", "{n}含有重复字符或过多感叹号。", "{n} contient des caractères répétés ou trop de points d’exclamation.", "{n}에 반복된 문자나 느낌표가 너무 많습니다."],"{n} can’t include {w}.":["{n} no puede incluir {w}.", "{n}不能包含{w}。", "{n} ne peut pas inclure {w}.", "{n}에는 {w}을(를) 포함할 수 없습니다."],"Date must be today or within the next year.":["La fecha debe ser hoy o dentro del próximo año.", "日期必须是今天或未来一年内。", "La date doit être aujourd’hui ou dans l’année à venir.", "날짜는 오늘 또는 앞으로 1년 이내여야 합니다."],"Start time must be between 7:00 AM and 9:00 PM.":["La hora de inicio debe estar entre las 7:00 y las 21:00.", "开始时间必须在上午7:00到晚上9:00之间。", "L’heure de début doit être entre 7 h 00 et 21 h 00.", "시작 시간은 오전 7시에서 오후 9시 사이여야 합니다."],"Spots must be a whole number from 1 to 100.":["Los cupos deben ser un número entero de 1 a 100.", "名额必须是1到100之间的整数。", "Le nombre de places doit être un entier de 1 à 100.", "정원은 1~100 사이의 정수여야 합니다."],"Please fill in every field before publishing.":["Complete todos los campos antes de publicar.", "发布前请填写所有项目。", "Veuillez remplir tous les champs avant de publier.", "게시하기 전에 모든 항목을 입력해 주세요."],"Your event uses words that are not allowed: {w}. Please reword it.":["Su evento usa palabras no permitidas: {w}. Por favor, reescríbalo.", "您的活动使用了不允许的词语：{w}。请修改。", "Votre événement utilise des mots interdits : {w}. Veuillez le reformuler.", "행사에 허용되지 않는 표현이 있습니다: {w}. 다시 써 주세요."],"Please fix the following:":["Corrija lo siguiente:", "请修正以下问题：", "Veuillez corriger ce qui suit :", "다음을 수정해 주세요:"],"You can post one event every 5 minutes. Please try again in {t}.":["Puede publicar un evento cada 5 minutos. Inténtelo de nuevo en {t}.", "每5分钟只能发布一个活动。请在{t}后重试。", "Vous pouvez publier un événement toutes les 5 minutes. Réessayez dans {t}.", "행사는 5분에 한 번만 올릴 수 있습니다. {t} 후에 다시 시도해 주세요."],"Too many tries. Wait 30 seconds and try again.":["Demasiados intentos. Espere 30 segundos e inténtelo de nuevo.", "尝试次数过多。请等待30秒后重试。", "Trop de tentatives. Attendez 30 secondes et réessayez.", "시도 횟수가 너무 많습니다. 30초 후에 다시 시도해 주세요."],"That username or password isn’t right.":["El usuario o la contraseña no es correcto.", "用户名或密码不正确。", "Le nom d’utilisateur ou le mot de passe est incorrect.", "사용자 이름 또는 비밀번호가 올바르지 않습니다."],"Enter your name using letters only (2 to 40 characters).":["Escriba su nombre solo con letras (de 2 a 40 caracteres).", "请仅用字母输入姓名（2到40个字符）。", "Saisissez votre nom avec des lettres uniquement (2 à 40 caractères).", "이름은 영문자로만 입력해 주세요(2~40자)."],"Enter a valid email address, like name@example.com.":["Escriba un correo electrónico válido, como nombre@ejemplo.com.", "请输入有效的电子邮箱，例如 name@example.com。", "Saisissez une adresse e-mail valide, par exemple nom@exemple.com.", "올바른 이메일 주소를 입력해 주세요. 예: name@example.com."],"Please choose a PNG, JPG, WEBP or GIF image.":["Elija una imagen PNG, JPG, WEBP o GIF.", "请选择 PNG、JPG、WEBP 或 GIF 图片。", "Choisissez une image PNG, JPG, WEBP ou GIF.", "PNG, JPG, WEBP 또는 GIF 이미지를 선택해 주세요."],"That image is over 5 MB. Please pick a smaller one.":["Esa imagen supera los 5 MB. Elija una más pequeña.", "该图片超过5 MB，请选择较小的图片。", "Cette image dépasse 5 Mo. Choisissez-en une plus petite.", "이미지가 5MB를 넘습니다. 더 작은 이미지를 선택해 주세요."],"That file couldn’t be read as an image.":["No se pudo leer ese archivo como imagen.", "无法将该文件作为图片读取。", "Ce fichier n’a pas pu être lu comme une image.", "이 파일을 이미지로 읽을 수 없습니다."],"This list is full. The limit is 20 items.":["Esta lista está llena. El límite es de 20 elementos.", "此列表已满，最多20项。", "Cette liste est pleine. La limite est de 20 éléments.", "목록이 가득 찼습니다. 최대 20개까지입니다."],"Profile saved ✓":["Perfil guardado ✓", "资料已保存 ✓", "Profil enregistré ✓", "프로필이 저장되었습니다 ✓"],"Your bio can’t include {w}.":["Su biografía no puede incluir {w}.", "您的简介不能包含{w}。", "Votre bio ne peut pas inclure {w}.", "소개에는 {w}을(를) 포함할 수 없습니다."],"That entry {r}.":["Esa opción {r}.", "该项{r}。", "Cette entrée {r}.", "해당 항목: {r}."],"must be 2 to 24 characters":["debe tener de 2 a 24 caracteres", "必须为2到24个字符", "doit contenir de 2 à 24 caractères", "2~24자여야 합니다"],"can only use letters, numbers and basic punctuation":["solo puede usar letras, números y puntuación básica", "只能使用字母、数字和基本标点", "ne peut contenir que des lettres, des chiffres et la ponctuation de base", "영문자, 숫자, 기본 문장부호만 쓸 수 있습니다"],"has too many repeated letters":["tiene demasiadas letras repetidas", "重复字母过多", "contient trop de lettres répétées", "반복된 글자가 너무 많습니다"],"includes words, links or numbers that aren’t allowed":["incluye palabras, enlaces o números no permitidos", "包含不允许的词语、链接或数字", "contient des mots, liens ou numéros non autorisés", "허용되지 않는 단어, 링크 또는 숫자가 포함되어 있습니다"],"is already in the list":["ya está en la lista", "已在列表中", "est déjà dans la liste", "이미 목록에 있습니다"],"Write at least 10 characters.":["Escriba al menos 10 caracteres.", "请至少输入10个字符。", "Écrivez au moins 10 caractères.", "최소 10자 이상 입력해 주세요."],"Your message can’t include {w}.":["Su mensaje no puede incluir {w}.", "您的消息不能包含{w}。", "Votre message ne peut pas inclure {w}.", "메시지에는 {w}을(를) 포함할 수 없습니다."],"Message sent to 1 person.":["Mensaje enviado a 1 persona.", "消息已发送给1人。", "Message envoyé à 1 personne.", "1명에게 메시지를 보냈습니다."],"Message sent to {n} people.":["Mensaje enviado a {n} personas.", "消息已发送给{n}人。", "Message envoyé à {n} personnes.", "{n}명에게 메시지를 보냈습니다."],"No one has signed up in this browser yet, so no one was messaged.":["Nadie se ha apuntado en este navegador todavía, así que no se envió a nadie.", "此浏览器中还没有人报名，因此没有发送给任何人。", "Personne ne s’est encore inscrit dans ce navigateur ; aucun message n’a été envoyé.", "이 브라우저에서 신청한 사람이 아직 없어 아무에게도 보내지 않았습니다."],"{t}: {n} signed up in this browser. A real launch would send this by email or text.":["{t}: {n} inscritos en este navegador. Un lanzamiento real lo enviaría por correo o mensaje de texto.", "{t}：此浏览器中有{n}人报名。正式上线后将通过电子邮件或短信发送。", "{t} : {n} inscrits dans ce navigateur. Un vrai lancement l’enverrait par e-mail ou SMS.", "{t}: 이 브라우저에서 {n}명이 신청했습니다. 실제 서비스에서는 이메일이나 문자로 보냅니다."],"{n} upcoming event{h}{o}":["{n} evento próximo{h}{o}", "{n}个即将举行的活动{h}{o}", "{n} événement à venir{h}{o}", "다가오는 행사 {n}개{h}{o}"],"{n} upcoming events{h}{o}":["{n} eventos próximos{h}{o}", "{n}个即将举行的活动{h}{o}", "{n} événements à venir{h}{o}", "다가오는 행사 {n}개{h}{o}"],"hot only":["solo populares", "仅热门", "populaires seulement", "인기만"],"Skip to main content":["Saltar al contenido principal", "跳到主要内容", "Passer au contenu principal", "본문으로 건너뛰기"],"Restricted":["Restringido", "受限", "Restreint", "제한됨"],"Admin":["Administración", "管理", "Administration", "관리"],"Live events":["Eventos activos", "已上线活动", "Événements en ligne", "게시 중인 행사"],"Total sign-ups":["Total de inscripciones", "报名总数", "Total des inscriptions", "전체 신청 수"],"Awaiting review":["Pendientes de revisión", "待审核", "En attente de révision", "검토 대기"],"Open reports":["Denuncias abiertas", "未处理举报", "Signalements ouverts", "처리 전 신고"],"Average fill rate":["Ocupación promedio", "平均报满率", "Taux de remplissage moyen", "평균 마감률"],"Events full":["Eventos llenos", "已满活动", "Événements complets", "마감된 행사"],"Names collected":["Nombres recopilados", "已收集姓名", "Noms recueillis", "수집된 이름"],"Unique emails":["Correos únicos", "不同邮箱数", "E-mails uniques", "고유 이메일"],"On waitlists":["En listas de espera", "候补人数", "Sur liste d’attente", "대기자"],"Events posted by users":["Eventos publicados por usuarios", "用户发布的活动", "Événements publiés par des utilisateurs", "사용자가 올린 행사"],"Sign-ups by neighborhood":["Inscripciones por vecindario", "各社区报名数", "Inscriptions par quartier", "동네별 신청"],"Review queue":["Cola de revisión", "审核队列", "File de révision", "검토 대기열"],"Reports":["Denuncias", "举报", "Signalements", "신고"],"Sign-up export":["Exportar inscripciones", "导出报名数据", "Export des inscriptions", "신청 내보내기"],"Import events":["Importar eventos", "导入活动", "Importer des événements", "행사 가져오기"],"Events and attendees":["Eventos y asistentes", "活动与参加者", "Événements et participants", "행사 및 참가자"],"Recent activity":["Actividad reciente", "最近动态", "Activité récente", "최근 활동"],"Approve":["Aprobar", "批准", "Approuver", "승인"],"Reject":["Rechazar", "拒绝", "Rejeter", "거부"],"Remove event":["Eliminar evento", "删除活动", "Supprimer l’événement", "행사 삭제"],"Dismiss":["Descartar", "忽略", "Ignorer", "무시"],"Copy sign-up CSV":["Copiar CSV de inscripciones", "复制报名 CSV", "Copier le CSV des inscriptions", "신청 CSV 복사"],"Copy attendee list":["Copiar lista de asistentes", "复制参加者名单", "Copier la liste des participants", "참가자 명단 복사"],"Nothing is waiting for review.":["No hay nada pendiente de revisión.", "没有待审核的内容。", "Rien n’est en attente de révision.", "검토 대기 중인 항목이 없습니다."],"No open reports.":["No hay denuncias abiertas.", "没有未处理的举报。", "Aucun signalement ouvert.", "처리 전 신고가 없습니다."],"Activity from this session will show here.":["La actividad de esta sesión aparecerá aquí.", "本次会话的动态会显示在这里。", "L’activité de cette session s’affichera ici.", "이번 세션의 활동이 여기에 표시됩니다."],"Event reported by a neighbor":["Evento denunciado por un vecino", "邻居举报的活动", "Événement signalé par un voisin", "이웃이 신고한 행사"],"Profile reported by a neighbor":["Perfil denunciado por un vecino", "邻居举报的资料", "Profil signalé par un voisin", "이웃이 신고한 프로필"],"Sign-up counts are sample data.":["Las cifras de inscripción son datos de muestra.", "报名数量为示例数据。", "Les chiffres d’inscription sont des données d’exemple.", "신청 수는 예시 데이터입니다."],"Most popular:":["Más popular:", "最受欢迎：", "Le plus populaire :", "가장 인기:"],"Posted by":["Publicado por", "发布者：", "Publié par", "게시자:"],"No names collected yet. The sample sign-up counts have no names.":["Aún no se han recopilado nombres. Las cifras de muestra no tienen nombres.", "尚未收集姓名。示例报名数量没有姓名。", "Aucun nom recueilli pour l’instant. Les chiffres d’exemple n’ont pas de noms.", "아직 수집된 이름이 없습니다. 예시 신청 수에는 이름이 없습니다."],"Totals per event, plus a list of names and contacts from sign-ups made in this browser.":["Totales por evento, más una lista de nombres y contactos de las inscripciones hechas en este navegador.", "每个活动的合计，以及此浏览器中报名者的姓名和联系方式列表。", "Totaux par événement, plus une liste des noms et contacts des inscriptions faites dans ce navigateur.", "행사별 합계와 이 브라우저에서 신청한 사람의 이름 및 연락처 목록입니다."],"One event per line: title, neighborhood, date (YYYY-MM-DD), time (HH:MM), location, spots, category, description. Rows are checked with the same rules as the Create form.":["Un evento por línea: título, vecindario, fecha (AAAA-MM-DD), hora (HH:MM), lugar, cupos, categoría, descripción. Las filas se revisan con las mismas reglas del formulario Crear.", "每行一个活动：标题、社区、日期（YYYY-MM-DD）、时间（HH:MM）、地点、名额、类别、描述。每行都会按“创建”表单的规则检查。", "Un événement par ligne : titre, quartier, date (AAAA-MM-JJ), heure (HH:MM), lieu, places, catégorie, description. Les lignes sont vérifiées avec les mêmes règles que le formulaire Créer.", "한 줄에 행사 하나: 제목, 동네, 날짜(YYYY-MM-DD), 시간(HH:MM), 장소, 정원, 카테고리, 설명. 각 줄은 만들기 양식과 같은 규칙으로 검사됩니다."],"left":["libres", "剩余", "restantes", "남음"],"on waitlist":["en espera", "候补", "en attente", "대기"],"posted by":["publicado por", "发布者", "publié par", "게시자"],"{a} sent a message to {n} attendees of {e}.":["{a} envió un mensaje a {n} asistentes de {e}.", "{a}向{e}的{n}位参加者发送了消息。", "{a} a écrit à {n} participants de {e}.", "{a}님이 {e} 참가자 {n}명에게 메시지를 보냈습니다."],"{a} signed up for {e}":["{a} se apuntó a {e}", "{a}报名了{e}", "{a} s’est inscrit à {e}", "{a}님이 {e}에 신청했습니다"],"{a} joined the waitlist for {e}":["{a} se unió a la lista de espera de {e}", "{a}加入了{e}的候补名单", "{a} a rejoint la liste d’attente de {e}", "{a}님이 {e} 대기자 명단에 등록했습니다"],"{a} posted {e}":["{a} publicó {e}", "{a}发布了{e}", "{a} a publié {e}", "{a}님이 {e}을(를) 올렸습니다"],"{a} posted {e} (pending)":["{a} publicó {e} (pendiente)", "{a}发布了{e}（待审核）", "{a} a publié {e} (en attente)", "{a}님이 {e}을(를) 올렸습니다(대기 중)"],'Montgomery County, MD / Community events':['Condado de Montgomery, MD / Eventos comunitarios','马里兰州蒙哥马利县 / 社区活动','Comté de Montgomery, MD / Événements communautaires','메릴랜드 몽고메리 카운티 / 지역 행사'],'New event':['Nuevo evento','新活动','Nouvel événement','새 행사'],'Create an event':['Crear un evento','创建活动','Créer un événement','행사 만들기'],'Letters, numbers and basic punctuation only. No links, emails, phone numbers, ALL CAPS or money-related words. New events are reviewed by parks staff before they appear.':['Solo letras, números y signos de puntuación básicos. Sin enlaces, correos, teléfonos, MAYÚSCULAS ni palabras sobre dinero. El personal de parques revisa los eventos nuevos antes de publicarlos.','仅限字母、数字和基本标点。不得包含链接、邮箱、电话号码、全大写或与金钱相关的词语。新活动需经公园工作人员审核后才会显示。','Lettres, chiffres et ponctuation de base uniquement. Pas de liens, d’e-mails, de numéros de téléphone, de MAJUSCULES ni de mots liés à l’argent. Le personnel des parcs vérifie les nouveaux événements avant leur publication.','영문자, 숫자, 기본 문장부호만 사용할 수 있습니다. 링크, 이메일, 전화번호, 모두 대문자, 돈 관련 단어는 쓸 수 없습니다. 새 행사는 공원 직원의 검토 후에 표시됩니다.'],'Event name':['Nombre del evento','活动名称','Nom de l’événement','행사 이름'],'Neighborhood':['Vecindario','社区','Quartier','동네'],'Date':['Fecha','日期','Date','날짜'],'Start time':['Hora de inicio','开始时间','Heure de début','시작 시간'],'Location':['Lugar','地点','Lieu','장소'],'Spots':['Cupos','名额','Places','정원'],'What to expect':['Qué esperar','活动简介','À quoi s’attendre','행사 안내'],'Publish event':['Publicar evento','发布活动','Publier l’événement','행사 게시'],'Save changes':['Guardar cambios','保存更改','Enregistrer','변경 저장'],'Morning walking club':['Club de caminata matutina','晨间步行俱乐部','Club de marche du matin','아침 걷기 모임'],'A short, friendly description':['Una descripción breve y amable','简短友好的描述','Une description courte et conviviale','짧고 친근한 설명'],'Neighbors':['Vecinos','邻居','Voisins','이웃'],'People near you':['Personas cerca de ti','您附近的人','Personnes près de chez vous','내 주변 사람들'],'Sample profiles. Only first names and last initials are shown, and members appear only if they opt in.':['Perfiles de muestra. Solo se muestran los nombres y la inicial del apellido, y los miembros aparecen solo si lo aceptan.','示例资料。仅显示名字和姓氏首字母，成员需选择公开才会出现。','Profils d’exemple. Seuls les prénoms et l’initiale du nom sont affichés, et les membres n’apparaissent que s’ils y consentent.','예시 프로필입니다. 이름과 성의 첣 글자만 표시되며, 동의한 회원만 나타납니다.'],'Block':['Bloquear','屏蔽','Bloquer','차단'],'Hobbies':['Pasatiempos','爱好','Loisirs','취미'],'Groups':['Grupos','小组','Groupes','모임'],'None yet':['Ninguno aún','暂无','Aucun pour l’instant','아직 없음'],'This is how neighbors see you.':['Así te ven tus vecinos.','这是邻居看到的您。','Voici ce que voient vos voisins.','이웃에게 보이는 모습입니다.'],'Account':['Cuenta','账户','Compte','계정'],'You don’t need an account to browse, sign up or post. Log in to personalize your profile or use admin tools.':['No necesita una cuenta para explorar, apuntarse o publicar. Inicie sesión para personalizar su perfil o usar las herramientas de administración.','浏览、报名或发布活动无需账户。登录后可自定义个人资料或使用管理工具。','Aucun compte n’est nécessaire pour parcourir, s’inscrire ou publier. Connectez-vous pour personnaliser votre profil ou utiliser les outils d’administration.','둘러보기, 신청, 게시에는 계정이 필요 없습니다. 로그인하면 프로필을 꾸미거나 관리 도구를 사용할 수 있습니다.'],'Username':['Usuario','用户名','Nom d’utilisateur','사용자 이름'],'Password':['Contraseña','密码','Mot de passe','비밀번호'],'Demo member: margaret / garden2026':['Miembro de prueba: margaret / garden2026','演示会员：margaret / garden2026','Membre de démonstration : margaret / garden2026','데모 회원: margaret / garden2026'],'Log in to add a profile picture, bio, hobbies and groups.':['Inicie sesión para añadir foto de perfil, biografía, pasatiempos y grupos.','登录后可添加头像、简介、爱好和小组。','Connectez-vous pour ajouter une photo, une bio, des loisirs et des groupes.','로그인하여 프로필 사진, 소개, 취미, 모임을 추가하세요.'],'Profile picture':['Foto de perfil','头像','Photo de profil','프로필 사진'],'Upload image':['Subir imagen','上传图片','Téléverser une image','이미지 업로드'],'Bio':['Biografía','个人简介','Bio','소개'],'My neighborhood':['Mi vecindario','我的社区','Mon quartier','내 동네'],'Show me in People':['Mostrarme en Personas','在“邻居”中显示我','Me montrer dans Voisins','이웃에 나 표시'],'Save profile':['Guardar perfil','保存资料','Enregistrer le profil','프로필 저장'],'Log out':['Cerrar sesión','退出登录','Se déconnecter','로그아웃'],'Add':['Añadir','添加','Ajouter','추가'],'Off by default. When on, neighbors see only your first name and last initial, picture, bio, hobbies and groups.':['Desactivado por defecto. Al activarlo, los vecinos solo ven su nombre, la inicial del apellido, foto, biografía, pasatiempos y grupos.','默认关闭。开启后，邻居只能看到您的名字、姓氏首字母、头像、简介、爱好和小组。','Désactivé par défaut. Une fois activé, vos voisins ne voient que votre prénom, l’initiale de votre nom, votre photo, bio, loisirs et groupes.','기본값은 꺼짐입니다. 켜면 이웃에게 이름, 성의 첣 글자, 사진, 소개, 취미, 모임만 보입니다.'],'mocosignup.app is an independent prototype with sample events. It is not run by Montgomery County, Montgomery Parks or M-NCPPC.':['mocosignup.app es un prototipo independiente con eventos de muestra. No lo gestiona el Condado de Montgomery, Montgomery Parks ni M-NCPPC.','mocosignup.app 是一个独立的原型，使用示例活动。它并非由蒙哥马利县、Montgomery Parks 或 M-NCPPC 运营。','mocosignup.app est un prototype indépendant avec des événements d’exemple. Il n’est pas géré par le comté de Montgomery, Montgomery Parks ou M-NCPPC.','mocosignup.app은 예시 행사가 있는 독립 프로토타입입니다. 몽고메리 카운티, Montgomery Parks, M-NCPPC에서 운영하지 않습니다.'],'Help':['Ayuda','帮助','Aide','도움말'],'Privacy':['Privacidad','隐私','Confidentialité','개인정보'],'Terms':['Términos','条款','Conditions','이용약관'],'Accessibility':['Accesibilidad','无障碍','Accessibilité','접근성'],'i.help.t':['¿Necesita ayuda?','需要帮助吗？','Besoin d’aide ?','도움이 필요하신가요?'],'i.help.b':['Llame al (301) 555-0142 (número de muestra), de lunes a viernes de 9 a 4, o escriba a help@mocosignup.app (dirección de muestra). Le guiaremos paso a paso para apuntarse.','请致电 (301) 555-0142（示例号码），工作日 9 点至 4 点，或发邮件至 help@mocosignup.app（示例地址）。我们会一步一步指导您报名。','Appelez le (301) 555-0142 (numéro d’exemple), du lundi au vendredi de 9 h à 16 h, ou écrivez à help@mocosignup.app (adresse d’exemple). Nous vous guiderons pas à pas pour vous inscrire.','(301) 555-0142(예시 번호)로 평일 오전 9시~오후 4시에 전화하시거나 help@mocosignup.app(예시 주소)으로 이메일을 보내 주세요. 신청 방법을 차근차근 안내해 드립니다.'],'i.privacy.t':['Su privacidad','您的隐私','Votre vie privée','개인정보 보호'],'i.privacy.b':['Explorar, apuntarse y publicar no requiere cuenta. Los miembros que inician sesión pueden añadir un perfil, que se guarda solo en su propio dispositivo. Nunca vendemos su información.','浏览、报名和发布无需账户。登录的会员可以添加个人资料，资料仅保存在自己的设备上。我们绝不出售您的信息。','Parcourir, s’inscrire et publier ne nécessitent aucun compte. Les membres connectés peuvent ajouter un profil, enregistré uniquement sur leur propre appareil. Nous ne vendons jamais vos informations.','둘러보기, 신청, 게시에는 계정이 필요 없습니다. 로그인한 회원은 프로필을 추가할 수 있으며, 프로필은 본인 기기에만 저장됩니다. 개인정보를 판매하지 않습니다.'],'i.terms.t':['Reglas de la comunidad','社区规则','Règles de la communauté','커뮤니티 규칙'],'i.terms.b':['Sea amable, mantenga los eventos gratuitos y honestos, y no publique estafas, enlaces ni datos de contacto personales. El personal puede eliminar lo que incumpla estas reglas. mocosignup.app es independiente y no lo gestiona el Condado de Montgomery, Montgomery Parks ni M-NCPPC.','请保持友善，活动须免费且真实，不得发布骗局、链接或个人联系方式。工作人员可删除违规内容。mocosignup.app 为独立项目，并非由蒙哥马利县、Montgomery Parks 或 M-NCPPC 运营。','Soyez aimable, gardez les événements gratuits et honnêtes, et ne publiez ni arnaques, ni liens, ni coordonnées personnelles. Le personnel peut supprimer ce qui enfreint ces règles. mocosignup.app est indépendant et n’est pas géré par le comté de Montgomery, Montgomery Parks ou M-NCPPC.','친절하게 대하고, 행사는 무료로 정직하게 올리며, 사기, 링크, 개인 연락처는 올리지 마세요. 규칙을 어기면 직원이 삭제할 수 있습니다. mocosignup.app은 독립 서비스이며 몽고메리 카운티, Montgomery Parks, M-NCPPC에서 운영하지 않습니다.'],'i.access.t':['Accesibilidad','无障碍','Accessibilité','접근성'],'i.access.b':['Diseñado para texto grande, alto contraste, botones grandes y uso con teclado. Trabajamos hacia WCAG 2.2 AA y aún falta una auditoría formal. Si algo es difícil de usar, avísenos en Ayuda.','专为大字体、高对比度、大按钮和键盘操作而设计。我们正在朝 WCAG 2.2 AA 努力，尚未进行正式审核。如果有任何不便，请通过“帮助”告诉我们。','Conçu pour les grands caractères, le contraste élevé, les grands boutons et l’usage au clavier. Nous visons la conformité WCAG 2.2 AA ; un audit formel reste à faire. Si quelque chose est difficile à utiliser, dites-le-nous via Aide.','큰 글씨, 높은 대비, 큰 버튼, 키보드 사용을 고려해 설계했습니다. WCAG 2.2 AA를 목표로 하고 있으며 공식 감사는 아직 남아 있습니다. 불편한 점이 있으면 도움말로 알려 주세요.'],'HOT':['POPULAR','热门','POPULAIRE','인기'],'Reported':['Denunciado','已举报','Signalé','신고됨'],'No events here yet':['Aún no hay eventos aquí','这里还没有活动','Aucun événement ici pour l’instant','아직 행사가 없습니다'],'No hot events here right now':['No hay eventos populares ahora','目前这里没有热门活动','Aucun événement populaire pour le moment','지금은 인기 행사가 없습니다'],'Try another neighborhood, or add one in Create.':['Pruebe otro vecindario o añada uno en Crear.','试试其他社区，或在“创建”中添加。','Essayez un autre quartier ou ajoutez-en un dans Créer.','다른 동네를 선택하거나 만들기에서 추가해 보세요.'],'Turn off Hot events or try another neighborhood.':['Desactive Eventos populares o pruebe otro vecindario.','关闭“热门活动”或试试其他社区。','Désactivez Événements populaires ou essayez un autre quartier.','인기 행사를 끄거나 다른 동네를 선택해 보세요.'],'Your spot was canceled.':['Su lugar fue cancelado.','您的名额已取消。','Votre place a été annulée.','자리가 취소되었습니다.'],'You left the waitlist.':['Salió de la lista de espera.','您已退出候补名单。','Vous avez quitté la liste d’attente.','대기자 명단에서 나왔습니다.'],'Thank you. Parks staff will review this event.':['Gracias. El personal de parques revisará este evento.','谢谢。公园工作人员将审核此活动。','Merci. Le personnel des parcs examinera cet événement.','감사합니다. 공원 직원이 이 행사를 검토합니다.'],'Thank you. Parks staff will review this profile.':['Gracias. El personal de parques revisará este perfil.','谢谢。公园工作人员将审核此资料。','Merci. Le personnel des parcs examinera ce profil.','감사합니다. 공원 직원이 이 프로필을 검토합니다.'],'Event canceled.':['Evento cancelado.','活动已取消。','Événement annulé.','행사가 취소되었습니다.'],'Blocked. You won’t see this person.':['Bloqueado. No verá a esta persona.','已屏蔽。您将不再看到此人。','Bloqué. Vous ne verrez plus cette personne.','차단되었습니다. 이 사람이 보이지 않습니다.'],'You’re on the waitlist for this event.':['Está en la lista de espera de este evento.','您已加入此活动的候补名单。','Vous êtes sur la liste d’attente de cet événement.','이 행사의 대기자 명단에 등록되었습니다.'],'You’ve made an event!':['¡Ha creado un evento!','您已创建活动！','Vous avez créé un événement !','행사를 만들었습니다!'],'It’s live in the feed now.':['Ya está publicado.','活动已上线。','Il est maintenant en ligne.','이제 목록에 표시됩니다.'],'Parks staff review new events first, so it will appear in the feed once approved.':['El personal de parques revisa primero los eventos nuevos; aparecerá cuando sea aprobado.','公园工作人员会先审核新活动，通过后才会显示。','Le personnel des parcs examine d’abord les nouveaux événements ; il apparaîtra une fois approuvé.','공원 직원이 새 행사를 먼저 검토하며, 승인되면 표시됩니다.'],'Event updated!':['¡Evento actualizado!','活动已更新！','Événement mis à jour !','행사가 수정되었습니다!'],'Your changes are live.':['Sus cambios ya están publicados.','您的更改已生效。','Vos modifications sont en ligne.','변경 사항이 적용되었습니다.'],'Parks staff will review your changes before the event shows again.':['El personal revisará sus cambios antes de mostrar el evento de nuevo.','公园工作人员将先审核您的更改，之后活动才会再次显示。','Le personnel examinera vos modifications avant que l’événement soit de nouveau visible.','직원이 변경 사항을 검토한 후 행사가 다시 표시됩니다.'],'Category':['Categoría','类别','Catégorie','카테고리'],'When':['Cuándo','时间','Quand','날짜'],'All types':['Todos los tipos','所有类型','Tous les types','모든 종류'],'Fitness':['Ejercicio','健身','Forme','운동'],'Arts':['Arte','艺术','Arts','예술'],'Health':['Salud','健康','Santé','건강'],'Learning':['Aprendizaje','学习','Apprentissage','배움'],'Outdoors':['Aire libre','户外','Plein air','야외'],'Social':['Social','社交','Convivialité','모임'],'Any date':['Cualquier fecha','任何日期','Toutes les dates','모든 날짜'],'Next 7 days':['Próximos 7 días','未来7天','7 prochains jours','앞으로 7일'],'Next 30 days':['Próximos 30 días','未来30天','30 prochains jours','앞으로 30일'],'Weekends':['Fines de semana','周末','Week-ends','주말'],'Accessible only':['Solo accesible','仅无障碍','Accessible uniquement','접근 가능만'],'Wheelchair accessible':['Accesible en silla de ruedas','轮椅无障碍','Accessible en fauteuil roulant','휠체어 이용 가능'],'Seating provided':['Asientos disponibles','提供座位','Sièges fournis','좌석 제공'],'Free parking':['Estacionamiento gratis','免费停车','Parking gratuit','무료 주차'],'Near public transit':['Cerca del transporte público','靠近公共交通','Près des transports en commun','대중교통 인근'],'Hearing loop':['Bucle auditivo','助听环路','Boucle auditive','청각 보조 루프'],'Weekly':['Semanal','每周','Hebdomadaire','매주'],'Message attendees':['Enviar mensaje a los asistentes','给参加者发消息','Écrire aux participants','참가자에게 메시지'],'Edit':['Editar','编辑','Modifier','수정'],'Cancel event':['Cancelar evento','取消活动','Annuler l’événement','행사 취소'],'Tap again to confirm':['Toque otra vez para confirmar','再点一次确认','Touchez à nouveau pour confirmer','한 번 더 눌러 확인'],'Repeat':['Repetir','重复','Répéter','반복'],'Does not repeat':['No se repite','不重复','Ne se répète pas','반복 안 함'],'Weekly for 4 weeks':['Semanal por 4 semanas','每周一次，共4周','Chaque semaine pendant 4 semaines','4주 동안 매주'],'Weekly for 8 weeks':['Semanal por 8 semanas','每周一次，共8周','Chaque semaine pendant 8 semaines','8주 동안 매주'],'Accessibility (check all that apply)':['Accesibilidad (marque todo lo que corresponda)','无障碍设施（可多选）','Accessibilité (cochez tout ce qui s’applique)','접근성 (해당 항목을 모두 선택)'],'Choose one':['Elija uno','请选择','Choisissez','선택하세요'],'Message':['Mensaje','消息','Message','메시지'],'Send message':['Enviar mensaje','发送消息','Envoyer le message','메시지 보내기'],
+'Events':['Eventos','活动','Événements','행사'],
+'Create':['Crear','创建','Créer','만들기'],
+'People':['Personas','邻居','Voisins','이웃'],
+'What’s on near you':['Qué hay cerca de ti','附近有什么活动','Ce qui se passe près de chez vous','내 주변 행사'],
+'Free community events. Pick your neighborhood, then reserve a spot. No account needed.':['Eventos comunitarios gratuitos. Elija su vecindario y reserve un lugar. No necesita cuenta.','免费的社区活动。选择您的社区，然后预留名额。无需账户。','Événements communautaires gratuits. Choisissez votre quartier, puis réservez une place. Aucun compte requis.','무료 지역 행사입니다. 동네를 고르고 자리를 예약하세요. 계정은 필요 없습니다.'],
+'Where are you?':['¿Dónde está?','您在哪里？','Où êtes-vous ?','어디에 계신가요?'],
+'Anywhere nearby':['Cualquier lugar cercano','附近任何地方','N’importe où à proximité','근처 어디든'],
+'Hot events':['Eventos populares','热门活动','Événements populaires','인기 행사'],
+'Search':['Buscar','搜索','Rechercher','검색'],
+'Sign up':['Apuntarme','报名','S’inscrire','신청하기'],
+'Spot reserved ✓':['Lugar reservado ✓','名额已预留 ✓','Place réservée ✓','자리 예약됨 ✓'],
+'Join waitlist':['Unirme a la lista de espera','加入候补名单','Rejoindre la liste d’attente','대기자 등록'],
+'On the waitlist ✓':['En lista de espera ✓','已在候补名单 ✓','Sur liste d’attente ✓','대기 중 ✓'],
+'Cancel my spot':['Cancelar mi lugar','取消我的名额','Annuler ma place','내 자리 취소'],
+'Leave waitlist':['Salir de la lista','退出候补','Quitter la liste','대기 취소'],
+'Add to calendar':['Añadir al calendario','添加到日历','Ajouter au calendrier','캘린더에 추가'],
+'Directions':['Cómo llegar','路线','Itinéraire','길찾기'],
+'Report':['Denunciar','举报','Signaler','신고'],
+'going':['asistirán','人参加','participants','명 참가'],
+'spots left':['lugares libres','个空位','places restantes','자리 남음'],
+'spot left':['lugar libre','个空位','place restante','자리 남음'],
+'Log in':['Iniciar sesión','登录','Se connecter','로그인'],
+'Settings':['Ajustes','设置','Paramètres','설정'],
+'Close':['Cerrar','关闭','Fermer','닫기'],
+'Languages':['Idiomas','语言','Langues','언어'],
+'Switch to light mode':['Cambiar a modo claro','切换到浅色模式','Passer au mode clair','밝은 모드로 전환'],
+'Switch to dark mode':['Cambiar a modo oscuro','切换到深色模式','Passer au mode sombre','어두운 모드로 전환'],
+'Reserve my spot':['Reservar mi lugar','预留我的名额','Réserver ma place','내 자리 예약'],
+'Your name':['Su nombre','您的姓名','Votre nom','이름'],
+'Email':['Correo electrónico','电子邮箱','E-mail','이메일'],
+'Cancel':['Cancelar','取消','Annuler','취소'],
+'Done':['Listo','完成','Terminé','확인'],
+'You’re signed up!':['¡Ya está apuntado!','报名成功！','Vous êtes inscrit !','신청되었습니다!'],
+'Your spot is reserved for':['Su lugar está reservado para','您的名额已预留：','Votre place est réservée pour','자리가 예약되었습니다:'],
+'Reserve a spot for':['Reservar un lugar para','预留名额：','Réserver une place pour','자리 예약:'],
+'Join the waitlist for':['Unirse a la lista de espera de','加入候补名单：','Rejoindre la liste d’attente pour','대기자 등록:']
+};
+const tr=s=>lang==='en'?s:((TR[s]||[])[['es','zh','fr','ko'].indexOf(lang)]||s);
+const T=(k,o={})=>tr(k).replace(/\{(\w+)\}/g,(_,x)=>o[x]??'');
+const ST=[['#t-feed','Events'],['#f-cancel','Cancel editing'],['#t-mine','My events'],['label[for=f-url]','Official registration link (optional)'],['#t-mgr','Create'],['h1','What’s on near you'],['header p.muted','Free community events. Pick your neighborhood, then reserve a spot. No account needed.'],['#fl','Where are you?'],['label[for=q]','Search'],['label[for=su-n]','Your name'],['label[for=su-c]','Email'],['#f-su .alt','Cancel'],['label[for=f-cat]','Category'],['label[for=f-rep]','Repeat'],['#f-acc>.lab','Accessibility (check all that apply)'],['#skip','Skip to main content'],['#msg-t','Message attendees'],['label[for=msg-b]','Message'],['#f-msg .btn:not(.alt)','Send message'],['#f-msg .alt','Cancel']];
+function applyLang(){
+ document.documentElement.lang=lang;
+ ST.forEach(([s,k])=>{const el=document.querySelector(s);if(el)el.textContent=tr(k)});
+ $('q').placeholder=tr('Search')+'…';
+ $('cog').setAttribute('aria-label',tr('Settings'));$('m-set').setAttribute('aria-label',tr('Settings'));document.querySelector('.tabs').setAttribute('aria-label',tr('Sections'));
+ $('cats').previousElementSibling.textContent=tr('Category');$('dates').previousElementSibling.textContent=tr('When');$('accf').textContent=tr('Accessible only');
+ {const cv=$('f-cat').value,rv=$('f-rep').value;$('f-cat').innerHTML='<option value="">'+tr('Choose one')+'</option>'+CATS.map(c=>`<option value="${c}">${tr(c)}</option>`).join('');$('f-cat').value=cv;$('f-rep').innerHTML='<option value="0">'+tr('Does not repeat')+'</option>'+Array.from({length:10},(_,i)=>`<option value="${i+1}">${i?T('Weekly for {n} more weeks',{n:i+1}):tr('Weekly for 1 more week')}</option>`).join('');$('f-rep').value=rv}
+ renderAcc();[['f-title','Morning walking club'],['f-desc','A short, friendly description']].forEach(([i,k])=>$(i).placeholder=tr(k));
+ renderFilters();renderFeed();sync();
+}
+try{const l=localStorage.getItem('moco-lang');if(LANGS[l])lang=l}catch(_){}
+sb.addEventListener('click',e=>{
+ if(e.target.closest('#s-langs')){langOpen=!langOpen;renderSettings()}
+ const l=e.target.closest('[data-lang]');
+ if(l){lang=l.dataset.lang;try{localStorage.setItem('moco-lang',lang)}catch(_){}applyLang();renderSettings()}
+});
+
+/* ---------- Extra admin metrics ---------- */
+function extra(L,q){
+ const H=t=>`<p class="kicker mt-10 mb-4">${t}</p>`,st=(n,l)=>`<div class="stat"><b>${n}</b><span class="muted">${l}</span></div>`;
+ const leftOf=e=>Math.max(0,e.spots-takenId(e.id)),tot=L.reduce((n,e)=>n+going(e),0),cap=L.reduce((n,e)=>n+going(e)+leftOf(e),0);
+ const uniq=new Set(signups.map(s=>s.c.toLowerCase())).size,pct=e=>Math.round(100*going(e)/(going(e)+leftOf(e)||1));
+ const rows=[...L].sort((a,b)=>going(b)-going(a)).map(e=>{const a=signups.filter(s=>s.id===e.id&&s.d===e.date);return `<div class="card mb-4"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b lang="en">${esc(e.title)}</b><span class="mono">${pct(e)}%</span></div><div class="bar" style="margin-top:8px"><i style="width:${pct(e)}%"></i></div><p class="muted mt-2" style="font-size:1.0625rem">${esc(e.hood)} / ${going(e)} ${tr('going')} / ${leftOf(e)} ${tr('left')} / ${a.filter(s=>s.wl).length} ${tr('on waitlist')}${e.by?' / '+tr('posted by')+' '+esc(e.by):''}</p>${attendeesHTML(e.id)}${GOING[e.id]?`<p class="muted" style="font-size:1rem">${tr('Sample sign-up counts have no names.')}</p>`:''}</div>`}).join('');
+ const act=[...messages.map(m=>({t:m.t,m:T('{a} sent a message to {n} attendees of {e}.',{a:esc(m.by),n:m.n,e:esc((events.find(x=>x.id===m.id)||{}).title||'an event')})})),...signups.map(s=>({t:s.t,m:T(s.wl?'{a} joined the waitlist for {e}':'{a} signed up for {e}',{a:esc(s.n),e:esc((events.find(x=>x.id===s.id)||{}).title||'an event')})})),...events.filter(e=>e.at).map(e=>({t:e.at,m:T(e.ok===false?'{a} posted {e} (pending)':'{a} posted {e}',{a:esc(e.by||'Guest'),e:esc(e.title)})}))].sort((a,b)=>b.t-a.t).slice(0,10);
+ return `<div class="stats mt-4">${st(Math.round(100*tot/(cap||1))+'%','Average fill rate')}${st(L.filter(e=>leftOf(e)<=0).length,'Events full')}${st(signups.length,'Names collected')}${st(uniq,'Unique emails')}${st(signups.filter(s=>s.wl).length,'On waitlists')}${st(events.filter(e=>e.by).length,'Events posted by users')}</div>
+ ${H('Monthly report')}${monthHTML()}
+ ${H('Import events')}<p class="muted mb-3" style="font-size:1.0625rem">One event per line: title, neighborhood, date (YYYY-MM-DD), time (HH:MM), location, spots, category, description. Rows are checked with the same rules as the Create form.</p><textarea class="field" id="imp" aria-label="${tr('Import events')}" rows="5" placeholder="Chair Yoga Class,Rockville,2026-12-01,10:00,Rockville Senior Center,12,Fitness,A gentle seated class with mats and chairs provided."></textarea><button class="btn mt-3" id="imp-go">Import events</button><div id="imp-out" class="mt-3" role="status"></div>
+ ${H('Events and attendees')}${rows}${H('Recent activity')}${act.length?act.map(a=>`<p class="row" style="gap:12px;flex-wrap:nowrap;font-size:1.0625rem"><span class="mono muted" style="flex:none">${new Date(a.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</span><span>${a.m}</span></p>`).join(''):'<p class="muted">Activity from this session will show here.</p>'}`;
+}
+
+/* ---------- Categories, dates, accessibility, messages, import ---------- */
+const CATS=['Fitness','Arts','Health','Learning','Outdoors','Social'];
+const ACC=['Wheelchair accessible','Seating provided','Free parking','Near public transit','Hearing loop'];
+const DW=[['any','Any date'],['7','Next 7 days'],['30','Next 30 days'],['wknd','Weekends']];
+const messages=[];
+const dwOk=e=>{if(dw==='any')return true;const d=new Date(e.date+'T12:00:00'),t=new Date();t.setHours(0,0,0,0);if(dw==='wknd')return d.getDay()===0||d.getDay()===6;const n=(d-t)/864e5;return n>=0&&n<=+dw};
+$('f-cat').innerHTML+=CATS.map(c=>`<option>${c}</option>`).join('');
+$('f-acc').insertAdjacentHTML('beforeend','<div class="row">'+ACC.map(a=>`<label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" value="${a}" style="width:24px;height:24px"> ${a}</label>`).join('')+'</div>');
+$('cats').onclick=e=>{const b=e.target.closest('[data-cat]');if(b){cat=b.dataset.cat;renderFilters();renderFeed()}};
+$('dates').onclick=e=>{const b=e.target.closest('[data-dw]');if(b){dw=b.dataset.dw;renderFilters();renderFeed()}};
+$('accf').onclick=()=>{accOnly=!accOnly;renderFilters();renderFeed()};
+$('feed').addEventListener('click',e=>{const m=e.target.closest('[data-msg]');if(m)openMsg(+m.dataset.msg);const sh=e.target.closest('[data-share]');if(sh)shareEvent(+sh.dataset.share)});
+$('f-msg').onsubmit=e=>{
+ e.preventDefault();
+ const b=$('msg-b').value.trim(),bad=[...(/[^\x20-\x7E\n’]/.test(b)?['unusual characters']:[]),...textBad(b),...findRestricted(b)];
+ if(b.length<10||bad.length){$('msg-err').textContent=b.length<10?tr('Write at least 10 characters.'):T('Your message can’t include {w}.',{w:bad.map(tr).join(' / ')});$('msg-b').setAttribute('aria-invalid','true');$('msg-err').hidden=false;return}
+ $('msg-b').removeAttribute('aria-invalid');
+ const n=cnt(msgFor);messages.push({id:msgFor,n,t:Date.now(),by:user?user.name:'Organizer'});$('m-msg').hidden=true;
+ toast(n?(n===1?tr('Message sent to 1 person.'):T('Message sent to {n} people.',{n})):'No one has signed up in this browser yet, so no one was messaged.');
+};
+function csvLine(l){const o=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===','&&!q){o.push(c.trim());c=''}else c+=ch}o.push(c.trim());return o}
+function importRows(){
+ if(!isAdmin())return;
+ const lines=$('imp').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,50),good=[],bad=[];
+ const ids={title:'imp',hood:'imp',date:'imp',time:'imp',place:'imp',spots:'imp',desc:'imp'};
+ lines.forEach((l,i)=>{
+  const [title,h,date,time,place,sp,c,desc]=csvLine(l),hd=HOODS.find(x=>x.toLowerCase()===(h||'').toLowerCase()),ct=CATS.find(x=>x.toLowerCase()===(c||'').toLowerCase());
+  const v={title,hood:hd,date,time,place,spots:parseInt(sp,10),desc},p=[];
+  if(!title||!hd||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||!/^\d{2}:\d{2}$/.test(time||'')||!place||!(v.spots>0)||!ct||!desc)p.push('a field is missing or invalid');
+  else{p.push(...check(v,ids));if(findRestricted(title+' '+place+' '+desc).length)p.push('it uses words that are not allowed')}
+  if(p.length)bad.push('Line '+(i+1)+': '+p[0]);else good.push({id:nextId++,...v,cat:ct,acc:[],by:user.name,owner:user.k,at:Date.now(),ok:true});
+ });
+ events.push(...good);renderFilters();renderFeed();renderStaff();
+ $('imp-out').innerHTML='<p style="color:var(--ok);font-weight:700">Imported '+good.length+' of '+lines.length+'.</p>'+bad.map(b=>'<p style="color:var(--warn)">'+esc(b)+'</p>').join('');
+}
+
+function renderAcc(){
+ const on=[...document.querySelectorAll('#f-acc input:checked')].map(i=>i.value),o=document.querySelector('#f-acc .row');if(o)o.remove();
+ $('f-acc').insertAdjacentHTML('beforeend','<div class="row">'+ACC.map(a=>`<label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" value="${a}" ${on.includes(a)?'checked':''} style="width:24px;height:24px"> ${tr(a)}</label>`).join('')+'</div>');
+}
+
+/* ---------- Attendee lists (organizers and admins) ---------- */
+const cnt2=id=>signups.filter(s=>s.id===id).length;
+function attendeesHTML(id){
+ const l=signups.filter(s=>s.id===id),by={};
+ l.forEach(s=>{(by[s.d||'']=by[s.d||'']||[]).push(s)});
+ const head=`<p class="lab mt-4">${tr('Sign-ups')} (${l.length})</p>`;
+ if(!l.length)return head+`<p class="muted" style="font-size:1.0625rem">${tr('No sign-ups yet.')}</p>`;
+ return head+Object.keys(by).sort().map(d=>`<p class="meta" style="margin:10px 0 4px">${d?esc(fmtD(d)):''}</p>`+by[d].map(s=>`<p style="font-size:1.0625rem"><b>${esc(s.n)}</b> <span class="muted">${esc(s.c)}</span>${s.wl?` <span class="tag">${esc(tr('Waitlist')).toUpperCase()}</span>`:''}</p>`).join('')).join('')+`<p class="muted mt-2" style="font-size:1rem">${tr('Only sign-ups made in this browser are shown in this prototype.')}</p>`;
+}
+function copyAttendees(id){
+ const ev=events.find(x=>x.id===id),rows=[['Event','Date','Name','Email','Status'],...signups.filter(s=>s.id===id).map(s=>[ev.title,s.d||'',s.n,s.c,s.wl?'Waitlist':'Reserved'])];
+ const t=rows.map(r=>r.map(v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')).join('\n');
+ try{navigator.clipboard.writeText(t).then(()=>toast('Attendee list copied.'),()=>toast(t))}catch(_){toast(t)}
+}
+
+/* ---------- Recurring events, My events, share, print, report ---------- */
+let busyUntil=0;
+function cancelEdit(){editing=null;$('f-rep').disabled=false;$('f-new').reset();$('f-btn').textContent=tr('Publish event');$('f-cancel').hidden=true;$('warn').hidden=true}
+$('f-cancel').onclick=()=>{cancelEdit();setView('mine')};
+const cnt=id=>{const e=events.find(x=>x.id===id),c=e&&cur(e);return signups.filter(s=>s.id===id&&c&&s.d===c.date).length};
+function okUrl(u){try{const x=new URL(u);if(x.protocol!=='https:')return false;const h=x.hostname.toLowerCase(),d=n=>h===n||h.endsWith('.'+n);return d('montgomeryparks.org')||d('montgomerycountymd.gov')||(d('activecommunities.com')&&x.pathname.toLowerCase().startsWith('/activemontgomery'))}catch(_){return false}}
+function startEdit(id){const ev=events.find(x=>x.id===id);editing=ev.id;$('f-title').value=ev.title;$('f-hood').value=ev.hood;$('f-date').value=ev.date;$('f-time').value=ev.time;$('f-place').value=ev.place;$('f-spots').value=ev.spots;$('f-desc').value=ev.desc;$('f-cat').value=ev.cat||'';$('f-url').value=ev.url||'';$('f-rep').value=String(ev.reps||0);document.querySelectorAll('#f-acc input').forEach(i=>i.checked=(ev.acc||[]).includes(i.value));$('f-btn').textContent=tr('Save changes');$('f-cancel').hidden=false;setView('mgr')}
+function delClick(id){
+ const re=()=>{renderFilters();renderFeed();if(view==='mine')renderMine()};
+ if(delAsk===id){if(editing===id)cancelEdit();events=events.filter(x=>x.id!==id);[reserved,waitlisted].forEach(S=>[...S].forEach(k=>{if(k.startsWith(id+'@'))S.delete(k)}));signups=signups.filter(x=>x.id!==id);delAsk=null;toast('Event canceled.');re()}
+ else{delAsk=id;re();setTimeout(()=>{if(delAsk===id){delAsk=null;re()}},4000)}
+}
+function openMsg(id){msgFor=id;const ev=events.find(x=>x.id===id),n=cnt(id);$('msg-s').textContent=T('{t}: {n} signed up in this browser. A real launch would send this by email or text.',{t:ev.title,n});$('msg-err').hidden=true;$('msg-b').value='';show('m-msg')}
+function renderMine(){
+ const key=user?user.k:'g-'+me,l=events.filter(e=>e.owner===key);
+ $('mine').innerHTML=l.length?l.map(e=>{
+  const c=cur(e),st=e.ok===false?'Pending review':c?'Live':'Ended';
+  return `<article class="card"><span class="tag">${esc(tr(st)).toUpperCase()}</span><h3 lang="en">${esc(e.title)}</h3><p class="meta">${tm(e.time)} / ${esc(e.hood).toUpperCase()}</p><p>${c?fmtD(c.date):fmtD(e.date)}</p>${e.reps?`<p class="muted" style="font-size:1.0625rem">${T('Repeats weekly through {d}',{d:fmtD(lastD(e))})}</p>`:''}${attendeesHTML(e.id)}<div class="row mt-4"><button class="chip" data-edit="${e.id}">${tr('Edit')}</button>${cnt2(e.id)?`<button class="chip" data-copy="${e.id}">${tr('Copy attendee list')}</button>`:''}${c&&e.ok!==false?`<button class="chip" data-msg="${e.id}">${tr('Message attendees')}</button>`:''}<button class="chip" data-del="${e.id}">${tr(delAsk===e.id?'Tap again to confirm':'Cancel event')}</button></div></article>`}).join(''):`<div class="card text-center"><h3>You haven’t posted any events yet.</h3></div>`;
+}
+$('mine').addEventListener('click',e=>{const cp=e.target.closest('[data-copy]');if(cp)copyAttendees(+cp.dataset.copy);const ed=e.target.closest('[data-edit]'),dl=e.target.closest('[data-del]'),m=e.target.closest('[data-msg]');if(ed)startEdit(+ed.dataset.edit);if(dl)delClick(+dl.dataset.del);if(m)openMsg(+m.dataset.msg)});
+async function shareEvent(id){
+ const u=location.href.split('#')[0]+'#event-'+id,e=events.find(x=>x.id===id);
+ try{if(navigator.share){await navigator.share({title:e.title,url:u});return}}catch(err){if(err&&err.name==='AbortError')return}
+ try{await navigator.clipboard.writeText(u);toast('Link copied.')}catch(_){toast(u)}
+}
+function applyHash(){const m=/^#event-(\d+)$/.exec(location.hash);one=m?+m[1]:null;$('one').hidden=one===null;if(one!==null&&view!=='feed')setView('feed');renderFeed()}
+addEventListener('hashchange',applyHash);
+$('show-all').onclick=()=>{try{history.replaceState(null,'',location.pathname+location.search)}catch(_){location.hash=''}one=null;$('one').hidden=true;renderFeed()};
+$('prt').onclick=()=>window.print();
+{const off=()=>{$('offline').hidden=navigator.onLine};addEventListener('online',off);addEventListener('offline',off);off();
+ addEventListener('error',()=>toast('Something went wrong. Please refresh the page.'));addEventListener('unhandledrejection',()=>toast('Something went wrong. Please refresh the page.'));}
+let rpm=new Date().toLocaleDateString('en-CA').slice(0,7);
+function monthStats(ym){
+ const occ=[];
+ events.filter(e=>e.ok!==false).forEach(e=>{for(let k=0;k<=(e.reps||0);k++){const d=new Date(e.date+'T12:00:00');d.setDate(d.getDate()+7*k);const ds=d.toLocaleDateString('en-CA');if(ds.startsWith(ym)){const all=signups.filter(s=>s.id===e.id&&s.d===ds);occ.push({e,ds,rec:all.filter(s=>!s.wl),wl:all.filter(s=>s.wl),smp:GOING[e.id]||0})}}});
+ const sum=f=>occ.reduce((n,o)=>n+f(o),0),grp=key=>{const m={};occ.forEach(o=>{const k=o.e[key]||'-';m[k]=m[k]||{n:0,s:0};m[k].n++;m[k].s+=o.rec.length+o.smp});return Object.entries(m)};
+ const rec=sum(o=>o.rec.length),smp=sum(o=>o.smp),cap=sum(o=>o.e.spots);
+ return{occ,rec,smp,cap,wl:sum(o=>o.wl.length),fill:Math.round(100*(rec+smp)/((rec+smp+cap)||1)),uniq:new Set(occ.flatMap(o=>o.rec.map(s=>s.c.toLowerCase()))).size,hood:grp('hood'),cat:grp('cat'),top:[...occ].sort((a,b)=>(b.rec.length+b.smp)-(a.rec.length+a.smp)).slice(0,5)};
+}
+function monthHTML(){
+ const S=monthStats(rpm),opts=[],d=new Date();d.setDate(1);d.setMonth(d.getMonth()-3);
+ for(let i=0;i<7;i++){const v=d.toLocaleDateString('en-CA').slice(0,7);opts.push(`<option value="${v}" ${v===rpm?'selected':''}>${new Date(v+'-01T12:00:00').toLocaleDateString(lang==='en'?'en-US':lang,{month:'long',year:'numeric'})}</option>`);d.setMonth(d.getMonth()+1)}
+ const st=(n,l)=>`<div class="stat"><b>${n}</b><span class="muted">${l}</span></div>`,li=a=>a.map(([k,v])=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap;font-size:1.0625rem"><span>${esc(tr(k))}</span><b class="mono">${v.n} / ${v.s}</b></div>`).join('');
+ return `<label for="rp-m">Month</label><select class="field" id="rp-m">${opts.join('')}</select>
+ ${S.occ.length?`<div class="stats mt-4">${st(S.occ.length,'Events scheduled')}${st(S.rec,'Recorded sign-ups')}${st(S.smp,'Sample sign-ups (demo data)')}${st(S.wl,'On waitlists')}${st(S.cap,'Capacity (spots)')}${st(S.fill+'%','Fill rate')}</div>
+ <p class="lab mt-6">Sign-ups by neighborhood</p><p class="muted" style="font-size:1rem">Events / sign-ups</p>${li(S.hood)}<p class="lab mt-6">By category</p>${li(S.cat)}
+ <p class="lab mt-6">Top events</p>${S.top.map(o=>`<p style="font-size:1.0625rem"><b lang="en">${esc(o.e.title)}</b> <span class="muted">${fmtD(o.ds)} / ${o.rec.length+o.smp}</span></p>`).join('')}
+ <button class="btn alt mt-4" id="rp-copy">Copy monthly report</button>`:`<p class="muted mt-4">No events scheduled this month.</p>`}`;
+}
+function monthRows(ym){const S=monthStats(ym);return[['Month',ym],['Events scheduled',S.occ.length],['Recorded sign-ups',S.rec],['Sample sign-ups (demo data)',S.smp],['On waitlists',S.wl],['Capacity (spots)',S.cap],['Fill rate',S.fill+'%'],['Unique emails',S.uniq],[],['Event','Date','Neighborhood','Category','Recorded','Sample'],...S.occ.map(o=>[o.e.title,o.ds,o.e.hood,o.e.cat||'',o.rec.length,o.smp])]}
+$('staff').addEventListener('change',e=>{if(e.target.id==='rp-m'){rpm=e.target.value;renderStaff()}});
+
+/* ---------- Translate remaining static and dynamic text ---------- */
+function trDom(root){
+ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+ while(n=w.nextNode()){
+  if(n._o===undefined){if(!TR[n.nodeValue.trim()])continue;n._o=n.nodeValue}
+  const k=n._o.trim();n.nodeValue=n._o.replace(k,lang==='en'?k:tr(k));
+ }
+}
+{const m=renderMine,f=renderFeed,s=renderStaff,g=renderSettings,a=applyLang;
+ renderFeed=function(){f();trDom($('feed'))};
+  renderStaff=function(){s();trDom($('staff'))};
+ renderSettings=function(){g();trDom($('set-body'))};
+ renderMine=function(){m();trDom($('mine'))};
+ applyLang=function(){a();trDom(document.body)};}
+
+/* ---------- Accessibility: dialogs, focus, skip link ---------- */
+{const ovs=[...document.querySelectorAll('.ov')];let was=false,opener=null,lastOut=null;
+ const vis=()=>ovs.filter(o=>!o.hidden);
+ const foc=el=>[...el.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea')].filter(e=>!e.hidden&&e.offsetParent!==null);
+ document.addEventListener('focusin',e=>{if(!e.target.closest('.ov'))lastOut=e.target});
+ document.addEventListener('click',e=>{const b=e.target.closest('button,a');if(b&&!b.closest('.ov'))lastOut=b},true);
+ new MutationObserver(()=>{
+  const v=vis(),open=v.length>0;
+  ['header','main','footer','.skip','noscript'].forEach(q=>{const el=document.querySelector(q);if(el)el.inert=open});
+  if(open&&!was)opener=lastOut;
+  if(open){const top=v[v.length-1];if(!top.contains(document.activeElement))(foc(top)[0]||top).focus()}
+  if(!open&&was){if(opener&&document.body.contains(opener)&&opener.offsetParent!==null)opener.focus();else{focusHeading();if(!document.activeElement||document.activeElement===document.body)$('main').focus()}}
+  was=open;
+ }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden']});
+ $('skip').onclick=e=>{e.preventDefault();$('main').focus()};}
+
+/* ---------- Init ---------- */
+try{const t=localStorage.getItem('moco-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(_){}
+try{const k=localStorage.getItem('moco-user');if(k&&USERS[k])loginAs(k)}catch(_){}
+renderFilters();renderFeed();sync();applyLang();applyHash();
+</script>
+</body>
+</html>
