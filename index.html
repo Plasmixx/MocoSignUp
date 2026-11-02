@@ -344,7 +344,7 @@ function check(v,ids){
 
 /* ---------- Feed ---------- */
 function renderFilters(){
- $('filters').innerHTML=['All',...HOODS].map(h=>`<button class="chip" data-h="${h}" aria-pressed="${h===hood}">${h==='All'?tr('Anywhere nearby'):h}<small>${h==='All'?live().length:live().filter(e=>e.hood===h).length}</small></button>`).join('');
+ const tot=live().length;$('filters').innerHTML=['All',...HOODS].map(h=>`<button class="chip" data-h="${h}" aria-pressed="${h===hood}">${h==='All'?tr('Anywhere nearby'):h}<small>${tot?(h==='All'?tot:live().filter(e=>e.hood===h).length):''}</small></button>`).join('');
  $('hot').innerHTML=FLAME+tr('Hot events');$('hot').setAttribute('aria-pressed',hot);$('accf').setAttribute('aria-pressed',accOnly);$('cats').innerHTML=['All',...CATS].map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===cat}">${c==='All'?tr('All types'):tr(c)}</button>`).join('');$('dates').innerHTML=DW.map(([k,l])=>`<button class="chip" data-dw="${k}" aria-pressed="${k===dw}">${tr(l)}</button>`).join('');
 }
 function card(e){
