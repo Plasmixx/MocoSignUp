@@ -164,6 +164,7 @@ input,select,textarea{min-width:0;max-width:100%}
    <div><label for="f-url">Official registration link (optional)</label><input class="field" id="f-url" type="url" aria-describedby="warn" placeholder="https://" autocomplete="off" maxlength="200"></div>
    <div id="f-acc"><p class="lab">Accessibility (check all that apply)</p></div>
    <div><label for="f-desc">What to expect</label><textarea class="field" id="f-desc" aria-describedby="warn" rows="3" placeholder="A short, friendly description"></textarea></div>
+      <div id="f-hot-wrap" hidden><label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-hot" style="width:24px;height:24px"> <span>List as a "Hot" event.</span></label><p class="muted mt-2" style="font-size:1rem">Admin only. This event will appear at the top of the feed, and will show when visitors click Hot events, even before it has many sign-ups.</p></div>
    <button class="btn" type="submit" id="f-btn">Publish event</button>
    <button class="btn alt" type="button" id="f-cancel" hidden>Cancel editing</button>
   </form>
@@ -234,7 +235,7 @@ const live=()=>events.filter(e=>e.ok!==false).map(e=>{const c=cur(e);return c&&{
 
 /* ---------- Server data (Supabase) ---------- */
 function dbEventToApp(r){
-  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', url:r.official_url||'', ok:r.approved, by:r.owner_name||'', owner:r.owner_id, at:r.created_at?Date.parse(r.created_at):Date.now()};
+  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', url:r.official_url||'', ok:r.approved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, at:r.created_at?Date.parse(r.created_at):Date.now()};
 }
 async function loadServerData(){
   if(!supabaseClient){ renderFilters(); renderFeed(); return; }
@@ -344,7 +345,7 @@ function renderFilters(){
 function card(e){
  const oc=occOf(e.id),on=reserved.has(oc),wl=waitlisted.has(oc),g=going(e),left=Math.max(0,e.spots-takenId(e.id)),d=dp(e.date),rep=reports.some(r=>r.id===e.id);
  return `<article class="card ev"><div class="date"><span>${d.m}</span><b>${d.d}</b><span>${d.w}</span></div><div>
-  ${g>=HOT?'<span class="tag">HOT</span>':''}
+  ${(e.hot||g>=HOT)?'<span class="tag">HOT</span>':''}
   <h3 lang="en">${esc(e.title)}</h3>
   <p class="meta">EVT-${String(e.id).slice(0,8)} / ${tm(e.time)} / ${esc(e.hood).toUpperCase()}</p>
   ${e.reps?`<p class="muted" style="font-size:1.0625rem">${T('Repeats weekly through {d}',{d:fmtD(lastD(e))})}</p>`:''}
@@ -356,7 +357,7 @@ function card(e){
  </div></article>`;
 }
 function renderFeed(){
- const list=live().filter(e=>(one===null||e.id===one)&&(hood==='All'||e.hood===hood)&&(!hot||going(e)>=HOT)&&(cat==='All'||e.cat===cat)&&(!accOnly||(e.acc||[]).includes('Wheelchair accessible'))&&dwOk(e)&&(!sq||(e.title+' '+e.place+' '+e.desc+' '+e.hood).toLowerCase().includes(sq))).sort(hot?(a,b)=>going(b)-going(a):(a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+ const list=live().filter(e=>(one===null||e.id===one)&&(hood==='All'||e.hood===hood)&&(!hot||e.hot||going(e)>=HOT)&&(cat==='All'||e.cat===cat)&&(!accOnly||(e.acc||[]).includes('Wheelchair accessible'))&&dwOk(e)&&(!sq||(e.title+' '+e.place+' '+e.desc+' '+e.hood).toLowerCase().includes(sq))).sort(hot?(a,b)=>(b.hot?1:0)-(a.hot?1:0)||going(b)-going(a):(a,b)=>(b.hot?1:0)-(a.hot?1:0)||(a.date+a.time).localeCompare(b.date+b.time))
  $('count').textContent=list.length?T(list.length===1?'{n} upcoming event{h}{o}':'{n} upcoming events{h}{o}',{n:list.length,h:hood==='All'?'':' / '+hood,o:hot?' / '+tr('hot only'):''}):'';
  $('feed').innerHTML=list.length?list.map(card).join(''):`<div class="card text-center"><h3>${hot?'No hot events here right now':'No events here yet'}</h3><p class="muted mt-2">${hot?'Turn off Hot events or try another neighborhood.':'Try another neighborhood, or add one in Create.'}</p></div>`;
 }
@@ -370,12 +371,12 @@ $('feed').onclick=async e=>{
 };
 
 /* ---------- Views ---------- */
-function sync(){$('t-staff').hidden=!isAdmin()}
+function sync(){$('t-staff').hidden=!isAdmin();const hw=$('f-hot-wrap');if(hw)hw.hidden=!isAdmin()}
 function setView(v){
  if(v==='staff'&&!isAdmin())v='feed';view=v;
  ['feed','mgr','mine','staff'].forEach(k=>{$('v-'+k).hidden=k!==v;(k===v?$('t-'+k).setAttribute('aria-current','page'):$('t-'+k).removeAttribute('aria-current'))});
  
- if(v==='staff')renderStaff();if(v==='mine')renderMine();
+ if(v==='staff')renderStaff();if(v==='mine')renderMine();if(v==='mgr'){const hw=$('f-hot-wrap');if(hw)hw.hidden=!isAdmin();}
  scrollTo({top:0});
  document.title=tr({feed:'Events',mgr:'Create',mine:'My events',staff:'Admin'}[v])+' - mocosignup.app';
  focusHeading();
@@ -425,13 +426,13 @@ $('f-new').onsubmit=async ev=>{
   Object.values(ids).forEach(i=>$(i).setAttribute('aria-invalid',$(i).classList.contains('bad')));$('warn').hidden=false;$('warn').tabIndex=-1;$('warn').focus();return;
  }
  if(!editing){if(Date.now()<busyUntil)return;busyUntil=Date.now()+1500}
- const ok=isAdmin();
+ const ok=isAdmin();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
  if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}
-  const {error} = await supabaseClient.from('events').update({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), approved:ok}).eq('id', editing);
+  const {error} = await supabaseClient.from('events').update({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), approved:ok, ...(isAdmin()?{is_hot:isHot}:{})}).eq('id', editing);
   if(error){toast('Could not save that event. Please try again.');return}
   cancelEdit();await loadServerData();setView('feed');celebrate('Event updated!',ok?'Your changes are live.':'Parks staff will review your changes before the event shows again.');return}
  if(!user){toast('Please log in to post an event.');setView('feed');return}
-  const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user.k, approved:ok});
+  const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user.k, approved:ok, is_hot:isHot});
   if(error){toast('Could not publish that event. Please try again.');return}
   await loadServerData();
  $('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
@@ -720,7 +721,7 @@ function cancelEdit(){editing=null;$('f-rep').disabled=false;$('f-new').reset();
 $('f-cancel').onclick=()=>{cancelEdit();setView('mine')};
 const cnt=id=>{const e=events.find(x=>x.id===id),c=e&&cur(e);return signups.filter(s=>s.id===id&&c&&s.d===c.date).length};
 function okUrl(u){try{const x=new URL(u);if(x.protocol!=='https:')return false;const h=x.hostname.toLowerCase(),d=n=>h===n||h.endsWith('.'+n);return d('montgomeryparks.org')||d('montgomerycountymd.gov')||(d('activecommunities.com')&&x.pathname.toLowerCase().startsWith('/activemontgomery'))}catch(_){return false}}
-function startEdit(id){const ev=events.find(x=>x.id===id);editing=ev.id;$('f-title').value=ev.title;$('f-hood').value=ev.hood;$('f-date').value=ev.date;$('f-time').value=ev.time;$('f-place').value=ev.place;$('f-spots').value=ev.spots;$('f-desc').value=ev.desc;$('f-cat').value=ev.cat||'';$('f-url').value=ev.url||'';$('f-rep').value=String(ev.reps||0);document.querySelectorAll('#f-acc input').forEach(i=>i.checked=(ev.acc||[]).includes(i.value));$('f-btn').textContent=tr('Save changes');$('f-cancel').hidden=false;setView('mgr')}
+function startEdit(id){const ev=events.find(x=>x.id===id);editing=ev.id;$('f-title').value=ev.title;$('f-hood').value=ev.hood;$('f-date').value=ev.date;$('f-time').value=ev.time;$('f-place').value=ev.place;$('f-spots').value=ev.spots;$('f-desc').value=ev.desc;$('f-cat').value=ev.cat||'';$('f-url').value=ev.url||'';$('f-rep').value=String(ev.reps||0);if($('f-hot'))$('f-hot').checked=!!ev.hot;document.querySelectorAll('#f-acc input').forEach(i=>i.checked=(ev.acc||[]).includes(i.value));$('f-btn').textContent=tr('Save changes');$('f-cancel').hidden=false;setView('mgr')}
 async function delClick(id){
  const re=()=>{renderFilters();renderFeed();if(view==='mine')renderMine()};
  if(delAsk===id){if(editing===id)cancelEdit();await supabaseClient.from('events').delete().eq('id', id);[reserved,waitlisted].forEach(S=>[...S].forEach(k=>{if(String(k).startsWith(id+'@'))S.delete(k)}));delAsk=null;toast('Event canceled.');await loadServerData();re()}
