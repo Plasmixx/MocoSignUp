@@ -427,6 +427,10 @@ $('f-new').onsubmit=async ev=>{
   $('warn').innerHTML=esc(m.trim()||tr('Please fix the following:'))+(probs.length?'<ul class="mt-2 pl-6 list-disc font-normal">'+probs.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>':'');
   Object.values(ids).forEach(i=>$(i).setAttribute('aria-invalid',$(i).classList.contains('bad')));$('warn').hidden=false;$('warn').tabIndex=-1;$('warn').focus();return;
  }
+    try{
+ const mod=await supabaseClient.functions.invoke('moderate-event',{body:{text:v.title+' '+v.place+' '+v.desc}});
+ if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again.';$('warn').hidden=false;return;}
+}catch(e){}
  if(!editing){if(Date.now()<busyUntil)return;busyUntil=Date.now()+1500}
  const ok=isAdmin();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
  if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}
