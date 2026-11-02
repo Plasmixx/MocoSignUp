@@ -366,7 +366,7 @@ function card(e){
 }
 function renderFeed(){
  const list=live().filter(e=>(one===null||e.id===one)&&(hood==='All'||e.hood===hood)&&(!hot||e.hot||going(e)>=HOT)&&(cat==='All'||e.cat===cat)&&(!accOnly||(e.acc||[]).includes('Wheelchair accessible'))&&dwOk(e)&&(!sq||(e.title+' '+e.place+' '+e.desc+' '+e.hood).toLowerCase().includes(sq))).sort(hot?(a,b)=>(b.hot?1:0)-(a.hot?1:0)||going(b)-going(a):(a,b)=>(b.hot?1:0)-(a.hot?1:0)||(a.date+a.time).localeCompare(b.date+b.time))
- $('count').textContent=list.length?T(list.length===1?'{n} upcoming event{h}{o}':'{n} upcoming events{h}{o}',{n:list.length,h:hood==='All'?'':' / '+hood,o:hot?' / '+tr('hot only'):''}):'';
+ $('count').textContent=T(list.length===1?'{n} upcoming event{h}{o}':'{n} upcoming events{h}{o}',{n:list.length,h:hood==='All'?'':' / '+hood,o:hot?' / '+tr('hot only'):''});
 $('prt').hidden=!list.length;
 $('feed').innerHTML=list.length?list.map(card).join(''):`<div class="card text-center"><h3>${hot?'No hot events here right now':'No events here yet'}</h3><p class="muted mt-2">${hot?'Turn off Hot events or try another neighborhood.':'Try another neighborhood, or add one in Create.</p><p class="muted mt-4">How it works: pick a neighborhood, reserve a spot, then just show up.'}</p></div>`;
 }
@@ -841,7 +841,7 @@ function trDom(root){
  $('skip').onclick=e=>{e.preventDefault();$('main').focus()};}
 const TOUR=[{k:'Welcome',t:'Welcome to MoCo Sign up',b:'Free community events in Montgomery County, MD. You can browse and reserve a spot with no account.'},{k:'Step 1 of 4',t:'Find an event',b:'Pick a neighborhood, category, or date, or use Search. Tap an event to see where and when it is.'},{k:'Step 2 of 4',t:'Reserve a spot',b:'Tap Sign up, enter your name and email, then just show up. Only the organizer can see your name and email.'},{k:'Step 3 of 4',t:'Share an event',b:'Use the Create tab to post an event. New events are reviewed before they appear in the feed. Need help? Use Help in the footer, or email help@mocosignup.com.'}];
 let tourStep=0;
-function showTour(i){tourStep=Math.max(0,Math.min(TOUR.length-1,i));if(!$('m-tour'))return;$('tour-k').textContent=TOUR[tourStep].k;$('tour-t').textContent=TOUR[tourStep].t;$('tour-b').textContent=TOUR[tourStep].b;$('tour-back').hidden=tourStep===0;$('tour-next').textContent=tourStep===TOUR.length-1?'Done':'Next';show('m-tour')}
+function showTour(i){tourStep=Math.max(0,Math.min(TOUR.length-1,i));if(!$('m-tour'))return;$('tour-k').textContent='Step '+(tourStep+1)+' of 4';$('tour-t').textContent=TOUR[tourStep].t;$('tour-b').textContent=TOUR[tourStep].b;$('tour-back').hidden=tourStep===0;$('tour-next').textContent=tourStep===TOUR.length-1?'Done':'Next';show('m-tour')}
 function closeTour(){if($('m-tour'))$('m-tour').hidden=true;try{localStorage.setItem('moco-tour-seen','1')}catch(_){}}
 if($('tour-next'))$('tour-next').onclick=()=>{if(tourStep>=TOUR.length-1)closeTour();else showTour(tourStep+1)};
 if($('tour-back'))$('tour-back').onclick=()=>showTour(tourStep-1);
