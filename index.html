@@ -440,7 +440,7 @@ $('f-new').onsubmit=async ev=>{
   const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user?user.k:null, approved:ok, is_hot:isHot});
   if(error){toast('Could not publish that event. Please try again.');return}
   await loadServerData();
- $('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
+ clearDraft();$('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
  celebrate('You’ve made an event!',ok?'It’s live in the feed now.':'Parks staff review new events first, so it will appear in the feed once approved.');
 };
 
@@ -832,6 +832,10 @@ function trDom(root){
 
 /* ---------- Init ---------- */
 try{const t=localStorage.getItem('moco-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(_){}
+function saveDraft(){if(editing)return;try{localStorage.setItem('moco-draft',JSON.stringify({title:$('f-title').value,hood:$('f-hood').value,cat:$('f-cat').value,date:$('f-date').value,time:$('f-time').value,place:$('f-place').value,spots:$('f-spots').value,rep:$('f-rep').value,url:$('f-url').value,desc:$('f-desc').value,acc:[...document.querySelectorAll('#f-acc input:checked')].map(i=>i.value),hot:$('f-hot')?$('f-hot').checked:false}))}catch(_){}}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem('moco-draft')||'null');if(!d)return;['title','hood','cat','date','time','place','spots','rep','url','desc'].forEach(k=>{const el=$('f-'+k);if(el&&d[k]!=null)el.value=d[k]});document.querySelectorAll('#f-acc input').forEach(i=>{i.checked=(d.acc||[]).includes(i.value)});if($('f-hot')&&d.hot!=null)$('f-hot').checked=!!d.hot}catch(_){}}
+function clearDraft(){try{localStorage.removeItem('moco-draft')}catch(_){}}
+$('f-new').addEventListener('input',saveDraft);$('f-new').addEventListener('change',saveDraft);loadDraft();
 renderFilters();renderFeed();sync();applyLang();applyHash();
 try{ if(supabaseClient) supabaseClient.auth.onAuthStateChange(()=>{ refreshSession().then(()=>loadServerData()); }); }catch(_){}
 refreshSession().then(()=>loadServerData());
