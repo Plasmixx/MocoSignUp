@@ -270,6 +270,9 @@ async function loadCreatorSignups(){
     });
   }catch(_){}
 }
+function badgeHTML(id){const def=badgeDefs[id]||{};const label=def.label||(id==='verified_org'?'Verified organization':id==='admin'?'Admin':id);const icon=def.icon||(id==='verified_org'?'✓':id==='admin'?'🔨':'');const bg=def.bg||(id==='verified_org'?'#1d9bf0':'#dbe7f3');const fg=id==='verified_org'?'#fff':'#1f3a5f';if(id==='verified_org')return `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${bg};color:${fg};font-size:14px;font-weight:700" title="${esc(label)}" aria-label="${esc(label)}">${esc(icon)}</span>`;return `<span style="display:inline-flex;align-items:center;gap:4px;background:${bg};color:${fg};border-radius:999px;padding:2px 10px;font-size:0.9375rem;font-weight:700" title="${esc(label)}" aria-label="${esc(label)}">${esc(icon)}</span>`;}
+function organizerHTML(e){if(!e.owner)return '';const name=organizerNames[e.owner];if(!name)return '';const ids=(organizerBadges[e.owner]||[]).filter((v,i,a)=>a.indexOf(v)===i);const order=['verified_org','admin'];ids.sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)});return `<p class="muted" style="font-size:1.0625rem">${tr('Posted by')} <b style="color:var(--text)">${esc(name)}</b>${ids.length?' '+ids.map(badgeHTML).join(' '):''}</p>`;}
+async function loadOrganizerNames(){if(!supabaseClient)return;try{const {data}=await supabaseClient.from('public_profiles').select('id,display_name,is_admin');organizerNames={};organizerBadges={};(data||[]).forEach(p=>{if(p.display_name)organizerNames[p.id]=p.display_name;if(p.is_admin)organizerBadges[p.id]=['admin']})}catch(_){return}try{const {data}=await supabaseClient.from('profile_badges').select('profile_id,badge_id');(data||[]).forEach(r=>{(organizerBadges[r.profile_id]=organizerBadges[r.profile_id]||[]).push(r.badge_id)})}catch(_){}}
 async function loadServerData(){
   if(!supabaseClient){ renderFilters(); renderFeed(); return; }
   try{
@@ -277,6 +280,7 @@ async function loadServerData(){
     if(evErr) throw evErr;
     events = (ev||[]).map(r=>{const a=dbEventToApp(r); if(r.profiles) a.by=r.profiles.display_name||''; return a;});
 await loadBadges();
+await loadOrganizerNames();
     // Real signup counts only (no names/emails). Requires the event_signup_counts view from setup step 2.
     try{
       const {data:cnt} = await supabaseClient.from('event_signup_counts').select('*');
