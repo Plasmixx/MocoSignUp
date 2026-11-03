@@ -513,7 +513,7 @@ $('staff').onclick=async e=>{
  if(c=T('[data-trash]')){delPending=c.dataset.trash;show('m-del');return} else if(c=T('[data-ap]')){await supabaseClient.from('events').update({approved:true}).eq('id', c.dataset.ap);await loadServerData();toast('Approved. The event is now in the feed.')}
  else if(c=T('[data-rj]')){await supabaseClient.from('events').delete().eq('id', c.dataset.rj);await loadServerData();toast('Event rejected.')}
  else if(c=T('[data-rm]')){const i=+c.dataset.rm,r=reports[i];await supabaseClient.from('events').delete().eq('id', r.id);reports.splice(i,1);await loadServerData();toast('Event removed.')}
- else if(c=T('[data-dis]')){const r=reports[+c.dataset.dis];if(r&&r.rid){try{if(supabaseClient)await supabaseClient.rpc('dismiss_report',{p_report_id:r.rid})}catch(_){}}reports.splice(+c.dataset.dis,1);renderStaff();renderFeed();
+else if(c=T('[data-dis]')){const r=reports[+c.dataset.dis];if(r&&r.rid){try{if(supabaseClient)await supabaseClient.rpc('dismiss_report',{p_report_id:r.rid})}catch(_){}}reports.splice(+c.dataset.dis,1);renderStaff();renderFeed();}
  else if(T('#rp-copy')){copyCsv(monthRows(rpm));return}
  else if(T('#exp-go')){await exportEverything();return}
  else if(T('#imp-go')){importRows();return}
