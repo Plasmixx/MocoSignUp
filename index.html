@@ -568,10 +568,6 @@ function renderSettings(){
  if(!user)h+=`<div class="card"><p class="kicker">Account</p><p class="mt-2">Log in to add a profile picture, bio, hobbies and groups.</p><button class="btn mt-4" id="s-login">Log in</button></div>`;
  else h+=`<div class="row" style="flex-wrap:nowrap;gap:16px">${avSVG(user.name,P.color,64,P.photo)}<div><h3>${esc(user.name)}</h3><p class="meta" style="margin:0">${user.role==='admin'?'ADMIN':'MEMBER'}</p></div></div>
  h+=`<div><label for="s-name">Username</label><input class="field" id="s-name" maxlength="40" value="${esc(user.name)}"></div>`;
- <div><p class="lab">Profile picture</p><div class="row">${COLORS.map((c,i)=>`<button class="sw" data-c="${i}" style="background:${c}" aria-label="${tr('Color')} ${i+1}" aria-pressed="${!P.photo&&P.color===i}"></button>`).join('')}<button class="chip" id="s-up">Upload image</button></div><input type="file" id="s-file" accept="image/*" hidden></div>
- <div><label for="s-bio">Bio</label><textarea class="field" id="s-bio" rows="3" maxlength="160" placeholder="Tell your neighbors a little about you">${esc(P.bio)}</textarea></div>
- <div><p class="lab">Hobbies</p><div class="row">${chips(P.opts.hobbies,P.hobbies,'hobbies')}</div>${addRow('hobbies')}</div>
- <div><p class="lab">Groups</p><div class="row">${chips(P.opts.groups,P.groups,'groups')}</div>${addRow('groups')}</div>
  <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-name-save">Save username</button><button class="btn alt" id="s-out">Log out</button><button class="btn alt" id="s-claim">Claim my events</button>`;
  $('set-body').innerHTML=h;
 }
@@ -612,11 +608,7 @@ sb.addEventListener('click',async e=>{
   const b=[.../[^\x20-\x7E\n’]/.test(P.bio)?['unusual characters or emoji']:[],...textBad(P.bio),...findRestricted(P.bio).map(w=>'“'+tr(w)+'”')];
   if(!b.length)saveP();
   setMsg(b.length?T('Your bio can’t include {w}.',{w:b.map(tr).join(' / ')}):'Profile saved ✓',b.length);
- }
-});
-
-/* ---------- Search, calendar, sign-up details, organizer tools ---------- */
-const me=(()=>{try{let i=localStorage.getItem('moco-id');if(!i){i=Math.random().toString(36).slice(2);localStorage.setItem('moco-id',i)}return i}catch(_){return 'x'}})();
+if(T('#s-name-save')){const n=$('s-name').value.trim().replace(/\s+/g,' ');if(n.length<2||n.length>40)return setMsg('Username must be 2 to 40 characters.',1);if(textBad(n).length||findRestricted(n).length)return setMsg('That username includes words, links or numbers that aren’t allowed.',1);user.name=n;saveP();setMsg('Username changed.');renderSettings();return}
 const digits=s=>String(s).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
 const canEdit=e=>isAdmin()||(e.owner&&user&&e.owner===user.k);
 const calUrl=e=>{const d=e.date.replace(/-/g,''),en=String(Math.min(+e.time.slice(0,2)+2,23)).padStart(2,'0')+e.time.slice(3,5);return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(e.title)+'&dates='+d+'T'+e.time.replace(':','')+'00/'+d+'T'+en+'00&location='+encodeURIComponent(e.place+', '+e.hood+', MD')+'&details='+encodeURIComponent(e.desc)};
