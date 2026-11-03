@@ -274,6 +274,7 @@ let badgeDefs={},organizerNames={},organizerBadges={};
 function badgeHTML(id){const def=badgeDefs[id]||{};const label=def.label||(id==='verified_org'?'Verified organization':id==='admin'?'Admin':id);const icon=def.icon||(id==='verified_org'?'✓':id==='admin'?'🔨':'');const bg=def.bg||(id==='verified_org'?'#1d9bf0':'#dbe7f3');const fg=id==='verified_org'?'#fff':'#1f3a5f';if(id==='verified_org')return `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${bg};color:${fg};font-size:14px;font-weight:700" title="${esc(label)}" aria-label="${esc(label)}">${esc(icon)}</span>`;return `<span style="display:inline-flex;align-items:center;gap:4px;background:${bg};color:${fg};border-radius:999px;padding:2px 10px;font-size:0.9375rem;font-weight:700" title="${esc(label)}" aria-label="${esc(label)}">${esc(icon)}</span>`;}
 function organizerHTML(e){if(!e.owner)return '';const name=organizerNames[e.owner];if(!name)return '';const ids=(organizerBadges[e.owner]||[]).filter((v,i,a)=>a.indexOf(v)===i);const order=['verified_org','admin'];ids.sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)});return `<p class="muted" style="font-size:1.0625rem">${tr('Posted by')} <b style="color:var(--text)">${esc(name)}</b>${ids.length?' '+ids.map(badgeHTML).join(' '):''}</p>`;}
 async function loadOrganizerNames(){if(!supabaseClient)return;try{const {data}=await supabaseClient.from('public_profiles').select('id,display_name,is_admin');organizerNames={};organizerBadges={};(data||[]).forEach(p=>{if(p.display_name)organizerNames[p.id]=p.display_name;if(p.is_admin)organizerBadges[p.id]=['admin']})}catch(_){return}try{const {data}=await supabaseClient.from('profile_badges').select('profile_id,badge_id');(data||[]).forEach(r=>{(organizerBadges[r.profile_id]=organizerBadges[r.profile_id]||[]).push(r.badge_id)})}catch(_){}}
+async function loadReports(){if(!supabaseClient||!isAdmin())return;try{const {data}=await supabaseClient.rpc('get_open_reports');(data||[]).forEach(r=>{if(!reports.some(x=>x.id===r.event_id))reports.push({kind:'event',id:r.event_id,rid:r.report_id,t:r.event_title})})}catch(_){}}
 async function loadServerData(){
   if(!supabaseClient){ renderFilters(); renderFeed(); return; }
   try{
@@ -293,7 +294,7 @@ try{await loadOrganizerNames();}catch(_){}
       signups = (sg||[]).map(r=>({id:r.event_id, n:r.name, c:r.contact, wl:!!r.waitlist, t:r.created_at?Date.parse(r.created_at):Date.now(), d:r.occurrence_date||''}));
     }catch(_){}
   }catch(err){ toast('Could not load events from the server. Please refresh the page.'); }
-  await loadCreatorSignups();
+  await loadCreatorSignups();await loadReports();
   renderFilters(); renderFeed();
 }
 async function loadProfileForUser(authUser){
@@ -407,7 +408,7 @@ $('feed').onclick=async e=>{
  const s=e.target.closest('[data-sign]'),c=e.target.closest('[data-cancel]'),r=e.target.closest('[data-report]');
  if(s)openSU(s.dataset.sign);
  if(c){const id=c.dataset.cancel,oc=occOf(id),d=oc.split('@')[1];const wasReserved=reserved.has(oc);reserved.delete(oc);waitlisted.delete(oc);try{await supabaseClient.from('signups').delete().eq('event_id', id).eq('contact', (contact&&contact.c)||'');}catch(_){}toast(wasReserved?'Your spot was canceled.':'You left the waitlist.');await loadServerData()}
- if(r){const id=r.dataset.report;reports.push({kind:'event',id,t:events.find(x=>x.id===id).title});renderFeed();toast('Thank you. Parks staff will review this event.')}
+ if(r){const id=r.dataset.report;try{if(supabaseClient)await supabaseClient.rpc('submit_report',{p_event_id:id})}catch(_){}if(!reports.some(x=>x.id===id))reports.push({kind:'event',id,t:events.find(x=>x.id===id).title});renderFeed();toast('Thank you. Parks staff will review this event.')}
 };
 
 /* ---------- Views ---------- */
@@ -507,7 +508,7 @@ $('staff').onclick=async e=>{
  if(c=T('[data-trash]')){delPending=c.dataset.trash;show('m-del');return} else if(c=T('[data-ap]')){await supabaseClient.from('events').update({approved:true}).eq('id', c.dataset.ap);await loadServerData();toast('Approved. The event is now in the feed.')}
  else if(c=T('[data-rj]')){await supabaseClient.from('events').delete().eq('id', c.dataset.rj);await loadServerData();toast('Event rejected.')}
  else if(c=T('[data-rm]')){const i=+c.dataset.rm,r=reports[i];await supabaseClient.from('events').delete().eq('id', r.id);reports.splice(i,1);await loadServerData();toast('Event removed.')}
- else if(c=T('[data-dis]')){reports.splice(+c.dataset.dis,1)}
+ else if(c=T('[data-dis]')){const r=reports[+c.dataset.dis];if(r&&r.rid){try{if(supabaseClient)await supabaseClient.rpc('dismiss_report',{p_report_id:r.rid})}catch(_){}}reports.splice(+c.dataset.dis,1);renderStaff();renderFeed();
  else if(T('#rp-copy')){copyCsv(monthRows(rpm));return}
  else if(T('#exp-go')){await exportEverything();return}
  else if(T('#imp-go')){importRows();return}
