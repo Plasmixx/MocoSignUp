@@ -244,7 +244,30 @@ const live=()=>events.filter(e=>e.ok!==false).map(e=>{const c=cur(e);return c&&{
 /* ---------- Server data (Supabase) ---------- */
     // Secret Admin Password - STOP READING - User: MocoSignUpAdmin Pass: secretAdminPassword123
 function dbEventToApp(r){
-  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', url:r.official_url||'', ok:r.comroved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, at:r.created_at?Date.parse(r.created_at):Date.now()};
+  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', url:r.official_url||'', ok:r.comroved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, ch:r.creator_hash||'', at:r.created_at?Date.parse(r.created_at):Date.now()};
+}
+let creatorToken=null,creatorHash=null;
+try{creatorToken=localStorage.getItem('moco-creator-token');creatorHash=localStorage.getItem('moco-creator-hash')}catch(_){}
+async function sha256Hex(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function ensureCreatorKey(){
+  if(creatorToken&&creatorHash)return {token:creatorToken,hash:creatorHash};
+  try{
+    if(!creatorToken)creatorToken=crypto.randomUUID?crypto.randomUUID():('k-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+    creatorHash=await sha256Hex(creatorToken);
+    localStorage.setItem('moco-creator-token',creatorToken);localStorage.setItem('moco-creator-hash',creatorHash);
+    return {token:creatorToken,hash:creatorHash};
+  }catch(_){return null}
+}
+const isCreatorEvent=e=>!!(creatorHash&&e.ch&&e.ch===creatorHash);
+async function loadCreatorSignups(){
+  try{
+    if(!supabaseClient||!creatorToken)return;
+    const {data}=await supabaseClient.rpc('creator_signups',{p_token:creatorToken});
+    (data||[]).forEach(r=>{
+      const row={id:r.event_id,n:r.name,c:r.contact,wl:!!r.waitlist,t:r.created_at?Date.parse(r.created_at):Date.now(),d:r.occurrence_date||''};
+      if(!signups.some(s=>s.id===row.id&&s.c===row.c&&s.d===row.d))signups.push(row);
+    });
+  }catch(_){}
 }
 async function loadServerData(){
   if(!supabaseClient){ renderFilters(); renderFeed(); return; }
@@ -264,6 +287,7 @@ async function loadServerData(){
       signups = (sg||[]).map(r=>({id:r.event_id, n:r.name, c:r.contact, wl:!!r.waitlist, t:r.created_at?Date.parse(r.created_at):Date.now(), d:r.occurrence_date||''}));
     }catch(_){}
   }catch(err){ toast('Could not load events from the server. Please refresh the page.'); }
+  await loadCreatorSignups();
   renderFilters(); renderFeed();
 }
 async function loadProfileForUser(authUser){
@@ -440,12 +464,17 @@ $('f-new').onsubmit=async ev=>{
  if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again.';$('warn').hidden=false;return;}
 }catch(e){toast('Could not check that event. Please try again.');return}
  if(!editing){if(Date.now()<busyUntil)return;busyUntil=Date.now()+1500}
- const ok=true;const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
+ const ok=true;const creatorKey=user?null:await ensureCreatorKey();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
  if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}
+if(isCreatorEvent(ev0)&&!ev0.owner&&!isAdmin()){
+  const {data:okEdit}=await supabaseClient.rpc('update_creator_event',{p_token:creatorToken,p_event_id:editing,p_title:v.title,p_neighborhood:v.hood,p_category:v.cat,p_official_url:v.url||null,p_accessibility:v.acc,p_event_date:v.date,p_start_time:v.time,p_place:v.place,p_spots:v.spots,p_description:v.desc,p_repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0))});
+  if(!okEdit){toast('Could not save that event. Please try again.');return}
+  cancelEdit();await loadServerData();setView('feed');celebrate('Event updated!','Your changes are live.');return
+}
   const {error} = await supabaseClient.from('events').update({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), approved:ok, ...(isAdmin()?{is_hot:isHot}:{})}).eq('id', editing);
   if(error){toast('Could not save that event. Please try again.');return}
   cancelEdit();await loadServerData();setView('feed');celebrate('Event updated!',ok?'Your changes are live.':'Parks staff will review your changes before the event shows again.');return}
-  const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user?user.k:null, approved:ok, is_hot:isHot});
+  const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user?user.k:null, creator_hash:creatorKey?creatorKey.hash:null, approved:ok, is_hot:isHot});
   if(error){toast('Could not publish that event. Please try again.');return}
   await loadServerData();
  clearDraft();$('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
@@ -525,7 +554,7 @@ function renderSettings(){
  <div><label for="s-bio">Bio</label><textarea class="field" id="s-bio" rows="3" maxlength="160" placeholder="Tell your neighbors a little about you">${esc(P.bio)}</textarea></div>
  <div><p class="lab">Hobbies</p><div class="row">${chips(P.opts.hobbies,P.hobbies,'hobbies')}</div>${addRow('hobbies')}</div>
  <div><p class="lab">Groups</p><div class="row">${chips(P.opts.groups,P.groups,'groups')}</div>${addRow('groups')}</div>
- <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-save">Save profile</button><button class="btn alt" id="s-out">Log out</button>`;
+ <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-save">Save profile</button><button class="btn alt" id="s-out">Log out</button><button class="btn alt" id="s-claim">Claim my events</button>`;
  $('set-body').innerHTML=h;
 }
 const setMsg=(t,bad)=>{const m=$('s-msg');if(m){m.style.color=bad?'var(--warn)':'var(--ok)';m.textContent=tr(t)}};
@@ -550,7 +579,7 @@ const sb=$('set-body');
 sb.addEventListener('input',e=>{if(e.target.id==='s-bio'){P.bio=e.target.value;saveP()}});
 sb.addEventListener('change',e=>{if(e.target.id==='s-file')readPhoto(e.target.files[0]);});
 sb.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id.startsWith('s-new-')){e.preventDefault();addOwn(e.target.id.slice(6))}});
-sb.addEventListener('click',e=>{
+sb.addEventListener('click',async e=>{
  const T=s=>e.target.closest(s);
  if(T('#s-theme')){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('moco-theme',d.dataset.theme)}catch(_){}return renderSettings()}
  if(T('#s-login')){$('m-set').hidden=true;$('lg-err').hidden=true;show('m-login');return}
@@ -766,12 +795,19 @@ function okUrl(u){try{const x=new URL(u);if(x.protocol!=='https:')return false;c
 function startEdit(id){const ev=events.find(x=>x.id===id);editing=ev.id;$('f-title').value=ev.title;$('f-hood').value=ev.hood;$('f-date').value=ev.date;$('f-time').value=ev.time;$('f-place').value=ev.place;$('f-spots').value=ev.spots;$('f-desc').value=ev.desc;$('f-cat').value=ev.cat||'';$('f-url').value=ev.url||'';$('f-rep').value=String(ev.reps||0);if($('f-hot'))$('f-hot').checked=!!ev.hot;document.querySelectorAll('#f-acc input').forEach(i=>i.checked=(ev.acc||[]).includes(i.value));$('f-btn').textContent=tr('Save changes');$('f-cancel').hidden=false;setView('mgr')}
 async function delClick(id){
  const re=()=>{renderFilters();renderFeed();if(view==='mine')renderMine()};
- if(delAsk===id){if(editing===id)cancelEdit();await supabaseClient.from('events').delete().eq('id', id);[reserved,waitlisted].forEach(S=>[...S].forEach(k=>{if(String(k).startsWith(id+'@'))S.delete(k)}));delAsk=null;toast('Event canceled.');await loadServerData();re()}
+ if(delAsk===id){if(editing===id)cancelEdit();const evDel=events.find(x=>x.id===id);
+if(evDel&&isCreatorEvent(evDel)&&!evDel.owner&&!isAdmin()){
+  const {data:okDel}=await supabaseClient.rpc('delete_creator_event',{p_token:creatorToken,p_event_id:id});
+  if(!okDel){toast('Could not cancel that event. Please try again.');return}
+}else{
+  const {error:delErr}=await supabaseClient.from('events').delete().eq('id', id);
+  if(delErr){toast('Could not cancel that event. Please try again.');return}
+}[reserved,waitlisted].forEach(S=>[...S].forEach(k=>{if(String(k).startsWith(id+'@'))S.delete(k)}));delAsk=null;toast('Event canceled.');await loadServerData();re()}
  else{delAsk=id;re();setTimeout(()=>{if(delAsk===id){delAsk=null;re()}},4000)}
 }
 function openMsg(id){msgFor=id;const ev=events.find(x=>x.id===id),n=cnt(id);$('msg-s').textContent=T('{t}: {n} signed up. A real launch would send this by email or text.',{t:ev.title,n});$('msg-err').hidden=true;$('msg-b').value='';show('m-msg')}
 function renderMine(){
- const key=user?user.k:null,l=key?events.filter(e=>e.owner===key):[];
+ const key=user?user.k:null,l=events.filter(e=>(key&&e.owner===key)||isCreatorEvent(e));
  $('mine').innerHTML=l.length?l.map(e=>{
   const c=cur(e),st=e.ok===false?'Pending review':c?'Live':'Ended';
   return `<article class="card"><span class="tag">${esc(tr(st)).toUpperCase()}</span><h3 lang="en">${esc(e.title)}</h3><p class="meta">${tm(e.time)} / ${esc(e.hood).toUpperCase()}</p><p>${c?fmtD(c.date):fmtD(e.date)}</p>${e.reps?`<p class="muted" style="font-size:1.0625rem">${T('Repeats weekly through {d}',{d:fmtD(lastD(e))})}</p>`:''}${attendeesHTML(e.id)}<div class="row mt-4"><button class="chip" data-edit="${e.id}">${tr('Edit')}</button>${cnt2(e.id)?`<button class="chip" data-copy="${e.id}">${tr('Copy attendee list')}</button>`:''}${c&&e.ok!==false?`<button class="chip" data-msg="${e.id}">${tr('Message attendees')}</button>`:''}<button class="chip" data-del="${e.id}">${tr(delAsk===e.id?'Tap again to confirm':'Cancel event')}</button></div></article>`}).join(''):`<div class="card text-center"><h3>You haven’t posted any events yet.</h3></div>`;
