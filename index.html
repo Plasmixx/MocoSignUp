@@ -52,6 +52,7 @@ body{margin:0;background-color:var(--bg);color:var(--text);font:400 1.25rem/1.55
 :focus-visible,.field:focus,.field:focus-within{outline:3px solid var(--text);outline-offset:3px}
 .top{display:flex;justify-content:space-between;align-items:center;padding:20px 0 8px}
 .logo{font:600 1.375rem 'IBM Plex Mono',monospace;letter-spacing:-.03em}.logo{color:var(--text)}.logo span{color:var(--acc)}:root[data-theme=dark] .logo span{color:#3b82f6}
+:root[data-theme=dark] .tag{color:#60a5fa;border-color:#60a5fa}
 .kicker{font-size:1rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:10px;animation:pulse 2s 2}
 @keyframes pulse{50%{opacity:.35}}
@@ -63,13 +64,13 @@ h3{font-size:1.625rem;font-weight:700;line-height:1.2;letter-spacing:-.01em}
 .tab[aria-current=page]{color:var(--text);border-bottom-color:var(--acc)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .stack>*+*{margin-top:18px}
-.chip{min-height:52px;padding:0 18px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font-weight:700;font-size:1.1875rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:background .15s,border-color .15s}
+.chip{min-height:52px;padding:0 18px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);color:var(--text);font-weight:700;font-size:1.1875rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:background .15s,border-color .15s}
 .chip:hover{border-color:var(--text)}
 .chip small{font:500 0.875rem 'IBM Plex Mono',monospace;opacity:.7}
 .chip small:empty{display:none}
 .chip[aria-pressed=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
 #hot[aria-pressed=true]{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px}
+.card{background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:24px}
         #count{border-top:1px solid var(--line);padding-top:24px}
 .ev{display:grid;grid-template-columns:78px minmax(0,1fr);gap:22px}
 .date{border:1px solid var(--line2);border-radius:8px;text-align:center;padding:8px 0;align-self:start}
@@ -87,7 +88,7 @@ label,.lab{display:block;font-size:0.875rem;font-weight:600;letter-spacing:.12em
 .field{width:100%;min-height:60px;border:1px solid var(--line2);border-radius:8px;background:var(--field);color:var(--text);font:inherit;padding:12px 16px}
 .field:focus{border-color:var(--acc)}.field.bad{border-color:var(--warn)}.field::placeholder{color:#6b6b6b}
 .note{border:1px solid var(--warn);color:var(--warn);border-radius:8px;padding:14px 16px;font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat{min-width:0;overflow-wrap:anywhere}.stat span{font-size:1rem;line-height:1.3;display:block}.stat{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--panel)}.stat b{display:block;font:600 2.5rem 'IBM Plex Mono',monospace;line-height:1.1}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat{min-width:0;overflow-wrap:anywhere}.stat span{font-size:1rem;line-height:1.3;display:block}.stat{border:1px solid var(--line2);border-radius:10px;padding:16px;background:var(--panel)}.stat b{display:block;font:600 2.5rem 'IBM Plex Mono',monospace;line-height:1.1}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;padding:max(20px,env(safe-area-inset-top,0px)) 20px max(20px,env(safe-area-inset-bottom,0px));z-index:50;overflow-y:auto;backdrop-filter:blur(4px)}
 .sheet{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:28px;width:100%;max-width:540px;margin:auto;animation:rise .4s cubic-bezier(.2,1.3,.4,1)}
 @keyframes rise{from{transform:translateY(26px) scale(.96);opacity:0}}
@@ -99,7 +100,7 @@ label,.lab{display:block;font-size:0.875rem;font-weight:600;letter-spacing:.12em
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;left:-9999px;top:8px;z-index:100;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:8px;font-weight:700}.skip:focus{left:12px}
-:root[data-theme=dark] .field::placeholder{color:#6b6b6b}
+:root[data-theme=dark] .field::placeholder{color:#a3a3a3}
 body{overflow-wrap:anywhere}
 /* utilities */
 .fixed{position:fixed}.inset-0{inset:0}.pointer-events-none{pointer-events:none}
@@ -743,7 +744,7 @@ function extra(L,q){
  const H=t=>`<p class="kicker mt-10 mb-4">${t}</p>`,st=(n,l)=>`<div class="stat"><b>${n}</b><span class="muted">${l}</span></div>`;
  const leftOf=e=>Math.max(0,e.spots-takenId(e.id)),tot=L.reduce((n,e)=>n+going(e),0),cap=L.reduce((n,e)=>n+going(e)+leftOf(e),0);
  const uniq=new Set(signups.map(s=>s.c.toLowerCase())).size,pct=e=>Math.round(100*going(e)/(going(e)+leftOf(e)||1));
- const rows=[...L].sort((a,b)=>going(b)-going(a)).map(e=>{const a=signups.filter(s=>s.id===e.id&&s.d===e.date);return `<div class="card mb-4" style="position:relative"><button data-trash="${e.id}" aria-label="Delete ${esc(e.title)}" style="position:absolute;top:12px;right:12px;width:44px;height:44px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:1.25rem;line-height:1;cursor:pointer">🗑</button><div class="row" style="justify-content:space-between;flex-wrap:nowrap;padding-right:48px"><b lang="en">${esc(e.title)}</b><span class="mono">${pct(e)}%</span></div><div class="bar" style="margin-top:8px"><i style="width:${pct(e)}%"></i></div><p class="muted mt-2" style="font-size:1.0625rem">${esc(e.hood)} / ${going(e)} ${tr('going')} / ${leftOf(e)} ${tr('left')} / ${a.filter(s=>s.wl).length} ${tr('on waitlist')}${e.by?' / '+tr('posted by')+' '+esc(e.by):''}</p>${attendeesHTML(e.id)}</div>`}).join('');
+ const rows=[...L].sort((a,b)=>going(b)-going(a)).map(e=>{const a=signups.filter(s=>s.id===e.id&&s.d===e.date);return `<div class="card mb-4" style="position:relative"><button data-trash="${e.id}" aria-label="Delete ${esc(e.title)}" style="position:absolute;top:12px;right:12px;width:44px;height:44px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);font-size:1.25rem;line-height:1;cursor:pointer">🗑</button><div class="row" style="justify-content:space-between;flex-wrap:nowrap;padding-right:48px"><b lang="en">${esc(e.title)}</b><span class="mono">${pct(e)}%</span></div><div class="bar" style="margin-top:8px"><i style="width:${pct(e)}%"></i></div><p class="muted mt-2" style="font-size:1.0625rem">${esc(e.hood)} / ${going(e)} ${tr('going')} / ${leftOf(e)} ${tr('left')} / ${a.filter(s=>s.wl).length} ${tr('on waitlist')}${e.by?' / '+tr('posted by')+' '+esc(e.by):''}</p>${attendeesHTML(e.id)}</div>`}).join('');
  const act=[...messages.map(m=>({t:m.t,m:T('{a} sent a message to {n} attendees of {e}.',{a:esc(m.by),n:m.n,e:esc((events.find(x=>x.id===m.id)||{}).title||'an event')})})),...signups.map(s=>({t:s.t,m:T(s.wl?'{a} joined the waitlist for {e}':'{a} signed up for {e}',{a:esc(s.n),e:esc((events.find(x=>x.id===s.id)||{}).title||'an event')})})),...events.filter(e=>e.at).map(e=>({t:e.at,m:T(e.ok===false?'{a} posted {e} (pending)':'{a} posted {e}',{a:esc(e.by||'Guest'),e:esc(e.title)})}))].sort((a,b)=>b.t-a.t).slice(0,10);
  const past=[...events].filter(e=>e.ok!==false&&!cur(e)).sort((a,b)=>lastD(b).localeCompare(lastD(a)));
 const pastRows=past.length?past.map(e=>`<div class="card mb-4"><b lang="en">${esc(e.title)}</b><p class="muted mt-2" style="font-size:1.0625rem">${esc(e.hood)} / Last held ${fmtD(lastD(e))} / ${going(e)} going</p>${attendeesHTML(e.id)}</div>`).join(''):'<p class="muted">No past events yet.</p>';
