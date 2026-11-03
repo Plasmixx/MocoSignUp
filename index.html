@@ -202,6 +202,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div id="m-set" class="ov" hidden role="dialog" aria-modal="true" aria-label="Settings"><div class="sheet stack" id="set-body" style="max-width:600px"></div></div>
 <div id="m-su" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="su-t"><form class="sheet stack" id="f-su" novalidate><p class="kicker">Reserve</p><h2 id="su-t"></h2><p class="muted">The organizer uses this only to contact you about this event.</p><div id="su-err" class="note" hidden role="alert"></div><div><label for="su-n">Your name</label><input class="field" id="su-n" aria-describedby="su-err" autocomplete="name" maxlength="40"></div><div><label for="su-c">Email</label><input class="field" id="su-c" aria-describedby="su-err" type="email" autocomplete="email" maxlength="60"></div><button class="btn" type="submit" id="su-b">Reserve my spot</button><button type="button" class="btn alt" data-close="m-su">Cancel</button></form></div>
 <div id="m-msg" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="msg-t"><form class="sheet stack" id="f-msg" novalidate><p class="kicker">Organizer</p><h2 id="msg-t">Message attendees</h2><p class="muted" id="msg-s"></p><div id="msg-err" class="note" hidden role="alert"></div><div><label for="msg-b">Message</label><textarea class="field" id="msg-b" aria-describedby="msg-err" rows="4" maxlength="300"></textarea></div><button class="btn" type="submit">Send message</button><button type="button" class="btn alt" data-close="m-msg">Cancel</button></form></div>
+<div id="m-inbox" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="inbox-t"><div class="sheet stack"><p class="kicker">Message for you</p><h2 id="inbox-t"></h2><p id="inbox-b" lang="en"></p><p class="muted" id="inbox-from"></p><button class="btn" id="inbox-ok">Got it</button></div></div>
 <div id="m-tour" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="tour-t"><div class="sheet stack"><p class="kicker" id="tour-k">Welcome</p><h2 id="tour-t"></h2><p id="tour-b"></p><div class="row" style="justify-content:space-between"><button class="btn alt" id="tour-back" style="width:auto;padding:0 18px">Back</button><button class="btn" id="tour-next" style="width:auto;flex:1;padding:0 18px">Next</button></div><button class="link" id="tour-skip">Skip tour</button></div></div>
 <div id="m-info" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="info-t"><div class="sheet stack"><h2 id="info-t"></h2><p id="info-b"></p><button class="btn" data-close="m-info">Close</button></div></div><div id="m-del" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="del-t"><div class="sheet stack"><h2 id="del-t">Delete this event?</h2><p>Would you like to permanently delete this event from all records?</p><button class="btn" id="del-go" style="background:#c1272d;border-color:#c1272d;color:#fff">Delete event</button><button type="button" class="btn alt" data-close="m-del">Cancel</button></div></div>
 <div id="m-cel" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="cel-t"><div class="sheet text-center stack"><div class="ring"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2 id="cel-t" style="font-size:2.25rem"></h2><p id="cel-s" class="muted"></p><button class="btn" id="cel-ok" data-close="m-cel">Done</button></div></div>
@@ -734,6 +735,30 @@ const CATS=['Fitness','Arts','Health','Learning','Outdoors','Social'];
 const ACC=['Wheelchair accessible','Seating provided','Free parking','Near public transit','Hearing loop'];
 const DW=[['any','Any date'],['7','Next 7 days'],['30','Next 30 days'],['wknd','Weekends']];
 const messages=[];
+let inboxQueue=[],inboxCurrent=null,inboxChecked=false;
+function inboxSeenIds(){try{return JSON.parse(localStorage.getItem('moco-seen-msgs')||'[]')}catch(_){return []}}
+function markInboxSeen(id){try{const s=inboxSeenIds();if(!s.includes(id)){s.push(id);localStorage.setItem('moco-seen-msgs',JSON.stringify(s))}}catch(_){}}
+function showNextInbox(){
+  if(!inboxQueue.length){inboxCurrent=null;return}
+  inboxCurrent=inboxQueue[0];
+  $('inbox-t').textContent=inboxCurrent.event_title||'Message';
+  $('inbox-b').textContent=inboxCurrent.body||'';
+  $('inbox-from').textContent=(inboxCurrent.sender_name||'Organizer')+' · '+new Date(inboxCurrent.created_at).toLocaleString();
+  show('m-inbox');
+}
+async function checkInbox(){
+  if(inboxChecked)return;inboxChecked=true;
+  try{
+    if(!supabaseClient)return;
+    const email=contact&&contact.c?String(contact.c).trim().toLowerCase():null;
+    if(!email)return;
+    const {data}=await supabaseClient.rpc('get_messages_for_attendee',{p_contact:email});
+    const seen=inboxSeenIds();
+    inboxQueue=(data||[]).filter(m=>!seen.includes(m.message_id));
+    showNextInbox();
+  }catch(_){}
+}
+if($('inbox-ok'))$('inbox-ok').onclick=()=>{if(inboxCurrent)markInboxSeen(inboxCurrent.message_id);$('m-inbox').hidden=true;inboxQueue.shift();showNextInbox()};
 const dwOk=e=>{if(dw==='any')return true;const d=new Date(e.date+'T12:00:00'),t=new Date();t.setHours(0,0,0,0);if(dw==='wknd')return d.getDay()===0||d.getDay()===6;const n=(d-t)/864e5;return n>=0&&n<=+dw};
 $('f-cat').innerHTML+=CATS.map(c=>`<option>${c}</option>`).join('');
 $('f-acc').insertAdjacentHTML('beforeend','<div class="row">'+ACC.map(a=>`<label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" value="${a}" style="width:24px;height:24px"> ${a}</label>`).join('')+'</div>');
@@ -741,12 +766,16 @@ $('cats').onclick=e=>{const b=e.target.closest('[data-cat]');if(b){cat=b.dataset
 $('dates').onclick=e=>{const b=e.target.closest('[data-dw]');if(b){dw=b.dataset.dw;renderFilters();renderFeed()}};
 $('accf').onclick=()=>{accOnly=!accOnly;renderFilters();renderFeed()};
 $('feed').addEventListener('click',e=>{const m=e.target.closest('[data-msg]');if(m)openMsg(m.dataset.msg);const sh=e.target.closest('[data-share]');if(sh)shareEvent(sh.dataset.share)});
-$('f-msg').onsubmit=e=>{
+$('f-msg').onsubmit=async e=>{
  e.preventDefault();
  const b=$('msg-b').value.trim(),bad=[...(/[^\x20-\x7E\n’]/.test(b)?['unusual characters']:[]),...textBad(b),...findRestricted(b)];
  if(b.length<10||bad.length){$('msg-err').textContent=b.length<10?tr('Write at least 10 characters.'):T('Your message can’t include {w}.',{w:bad.map(tr).join(' / ')});$('msg-b').setAttribute('aria-invalid','true');$('msg-err').hidden=false;return}
  $('msg-b').removeAttribute('aria-invalid');
- const n=cnt(msgFor);messages.push({id:msgFor,n,t:Date.now(),by:user?user.name:'Organizer'});$('m-msg').hidden=true;
+ const n=cnt(msgFor);
+const msgToken=(()=>{try{return localStorage.getItem('moco-creator-token')}catch(_){return null}})();
+const {data:okMsg}=await supabaseClient.rpc('send_event_message',{p_token:msgToken,p_event_id:msgFor,p_body:b});
+if(!okMsg){$('msg-err').textContent=tr('Could not send that message. Please try again.');$('msg-err').hidden=false;return}
+messages.push({id:msgFor,n,t:Date.now(),by:user?user.name:'Organizer'});$('m-msg').hidden=true;
  toast(n?(n===1?tr('Message sent to 1 person.'):T('Message sent to {n} people.',{n})):'No one has signed up yet, so no one was messaged.');
 };
 function csvLine(l){const o=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===','&&!q){o.push(c.trim());c=''}else c+=ch}o.push(c.trim());return o}
@@ -892,8 +921,8 @@ function loadDraft(){try{const d=JSON.parse(localStorage.getItem('moco-draft')||
 function clearDraft(){try{localStorage.removeItem('moco-draft')}catch(_){}}
 $('f-new').addEventListener('input',saveDraft);$('f-new').addEventListener('change',saveDraft);loadDraft();
 renderFilters();renderFeed();sync();applyLang();applyHash();
-try{ if(supabaseClient) supabaseClient.auth.onAuthStateChange(()=>{ refreshSession().then(()=>loadServerData()); }); }catch(_){}
-refreshSession().then(()=>loadServerData());
+try{ if(supabaseClient) supabaseClient.auth.onAuthStateChange(()=>{ refreshSession().then(()=>loadServerData()).then(()=>checkInbox()); }); }catch(_){}
+refreshSession().then(()=>loadServerData()).then(()=>checkInbox());
 </script>
 <!-- Supabase client is now created before the main script, so the main script can use it on load. -->
 <script>
