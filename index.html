@@ -170,7 +170,8 @@ input,select,textarea{min-width:0;max-width:100%}
    <div id="f-acc"><p class="lab">Accessibility (check all that apply)</p></div>
    <div><label for="f-desc">What to expect</label><textarea class="field" id="f-desc" aria-describedby="warn" rows="3" placeholder="A short, friendly description"></textarea></div>
       <div id="f-hot-wrap" hidden><label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-hot" style="width:24px;height:24px"> <span>List as a "Hot" event.</span></label><p class="muted mt-2" style="font-size:1rem">Admin only. This event will appear at the top of the feed, and will show when visitors click Hot events, even before it has many sign-ups.</p></div>
-   <button class="btn" type="submit" id="f-btn">Publish event</button>
+   <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-agree" style="width:24px;height:24px"> <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a></span></label>
+<button class="btn" type="submit" id="f-btn">Publish event</button>
    <button class="btn alt" type="button" id="f-cancel" hidden>Cancel editing</button>
   </form>
  </section>
@@ -182,7 +183,7 @@ input,select,textarea{min-width:0;max-width:100%}
 
 <footer class="wrap muted" style="font-size:1rem;margin-top:48px;padding-top:32px;padding-bottom:48px;background:var(--panel);border-top:1px solid var(--line2)">
  mocosignup.com is an independent prototype. It is not run by Montgomery County, Montgomery Parks or M-NCPPC. mocosignup.com is run and moderated by the community.
- <div class="row mt-4"><button class="link" data-info="help">Help</button><button class="link" data-info="privacy">Privacy</button><button class="link" data-info="terms">Community rules</button><button class="link" data-info="access">Accessibility</button></div>
+ <div class="row mt-4"><button class="link" data-info="help">Help</button><a class="link" href="/privacy">Privacy Policy</a><a class="link" href="/terms">Terms</a><button class="link" data-info="access">Accessibility</button></div>
 <p style="margin-top:32px">Questions? Email help@mocosignup.com</p>
     <button class="link" id="tour-again">Take the tour again</button>
 </footer>
@@ -195,7 +196,8 @@ input,select,textarea{min-width:0;max-width:100%}
   <div><label for="lg-u">Email</label><input class="field" id="lg-u" aria-describedby="lg-err" type="email" autocomplete="email" autocapitalize="none" spellcheck="false"></div>
   <div><label for="lg-p">Password</label><input class="field" id="lg-p" aria-describedby="lg-err" type="password" autocomplete="current-password"></div>
   <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="lg-show" style="width:24px;height:24px"> <span>Show password</span></label>
-  <button class="btn" type="submit">Log in</button>
+  <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="lg-agree" style="width:24px;height:24px"> <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a></span></label>
+<button class="btn" type="submit">Log in</button>
   <button type="button" class="btn alt" data-close="m-login">Cancel</button>
  </form>
 </div>
@@ -458,6 +460,7 @@ $('f-hood').innerHTML+=HOODS.map(h=>`<option>${h}</option>`).join('');
 $('f-date').min=new Date().toLocaleDateString('en-CA');
 $('f-new').onsubmit=async ev=>{
  ev.preventDefault();
+ if(!$('f-agree')||!$('f-agree').checked){$('warn').textContent='Please agree to the Terms of Service and Privacy Policy to publish an event.';$('warn').hidden=false;return}
  if(!editing&&!isAdmin()){const w=Math.ceil((300000-(Date.now()-lastPost))/1000);if(w>0){$('warn').textContent=T('You can post one event every 5 minutes. Please try again in {t}.',{t:Math.floor(w/60)+':'+String(w%60).padStart(2,'0')});$('warn').hidden=false;$('warn').scrollIntoView({block:'center',behavior:'smooth'});return}}
  const ids={url:'f-url',title:'f-title',hood:'f-hood',cat:'f-cat',date:'f-date',time:'f-time',place:'f-place',spots:'f-spots',desc:'f-desc'};
  const v={title:$('f-title').value.trim(),hood:$('f-hood').value,cat:$('f-cat').value,url:$('f-url').value.trim(),acc:[...document.querySelectorAll('#f-acc input:checked')].map(i=>i.value),date:$('f-date').value,time:$('f-time').value,place:$('f-place').value.trim(),spots:parseInt($('f-spots').value,10),desc:$('f-desc').value.trim()};
@@ -541,7 +544,9 @@ async function logout(){ try{ await supabaseClient.auth.signOut(); }catch(_){} u
 let tries=0,lock=0;
 $('lg-show').onchange=e=>{$('lg-p').type=e.target.checked?'text':'password'};
 $('f-login').onsubmit=async e=>{
- e.preventDefault();const err=m=>{['lg-u','lg-p'].forEach(i=>$(i).setAttribute('aria-invalid','true'));$('lg-err').textContent=tr(m);$('lg-err').hidden=false};
+ e.preventDefault();
+ if(!$('lg-agree')||!$('lg-agree').checked){$('lg-err').textContent='Please agree to the Terms of Service and Privacy Policy to log in.';$('lg-err').hidden=false;return}
+ const err=m=>{['lg-u','lg-p'].forEach(i=>$(i).setAttribute('aria-invalid','true'));$('lg-err').textContent=tr(m);$('lg-err').hidden=false};
  const email=$('lg-u').value.trim(), pw=$('lg-p').value;
     // Here
  if(email==='MocoSignUpAdmin'&&pw==='secretAdminPassword123'){alert(atob('SGFoYSwgeW91J3JlIG5vdCBnb2luZyB0byBnZXQgYWRtaW4gdGhhdCBlYXNpbHk='));return;}
