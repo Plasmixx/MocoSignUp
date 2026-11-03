@@ -487,7 +487,7 @@ $('f-new').onsubmit=async ev=>{
  }
     try{
  const mod=await supabaseClient.functions.invoke('moderate-event',{body:{text:v.title+' '+v.place+' '+v.desc}});
- if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again.';$('warn').hidden=false;return;}
+ if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again — try removing any money, sales, link, or contact words, and keep it short and friendly.';$('warn').hidden=false;return;}
 }catch(e){toast('Could not check that event. Please try again.');return}
  if(!editing){if(window.__posting)return;window.__posting=true;if($('f-btn')){$('f-btn').disabled=true;$('f-btn').textContent='Publishing…'}}
  const ok=true;const creatorKey=user?null:await ensureCreatorKey();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
