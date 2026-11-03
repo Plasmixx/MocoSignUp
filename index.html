@@ -608,7 +608,9 @@ sb.addEventListener('click',async e=>{
   const b=[.../[^\x20-\x7E\n’]/.test(P.bio)?['unusual characters or emoji']:[],...textBad(P.bio),...findRestricted(P.bio).map(w=>'“'+tr(w)+'”')];
   if(!b.length)saveP();
   setMsg(b.length?T('Your bio can’t include {w}.',{w:b.map(tr).join(' / ')}):'Profile saved ✓',b.length);
+ }
 if(T('#s-name-save')){const n=$('s-name').value.trim().replace(/\s+/g,' ');if(n.length<2||n.length>40)return setMsg('Username must be 2 to 40 characters.',1);if(textBad(n).length||findRestricted(n).length)return setMsg('That username includes words, links or numbers that aren’t allowed.',1);user.name=n;saveP();setMsg('Username changed.');renderSettings();return}
+});
 const digits=s=>String(s).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
 const canEdit=e=>isAdmin()||(e.owner&&user&&e.owner===user.k);
 const calUrl=e=>{const d=e.date.replace(/-/g,''),en=String(Math.min(+e.time.slice(0,2)+2,23)).padStart(2,'0')+e.time.slice(3,5);return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(e.title)+'&dates='+d+'T'+e.time.replace(':','')+'00/'+d+'T'+en+'00&location='+encodeURIComponent(e.place+', '+e.hood+', MD')+'&details='+encodeURIComponent(e.desc)};
