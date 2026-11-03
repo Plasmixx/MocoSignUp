@@ -279,8 +279,7 @@ async function loadServerData(){
     const {data:ev, error:evErr} = await supabaseClient.from('events').select('*').order('event_date', {ascending:true});
     if(evErr) throw evErr;
     events = (ev||[]).map(r=>{const a=dbEventToApp(r); if(r.profiles) a.by=r.profiles.display_name||''; return a;});
-await loadBadges();
-await loadOrganizerNames();
+try{await loadBadges();await loadOrganizerNames();}catch(_){}
     // Real signup counts only (no names/emails). Requires the event_signup_counts view from setup step 2.
     try{
       const {data:cnt} = await supabaseClient.from('event_signup_counts').select('*');
