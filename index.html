@@ -8,9 +8,7 @@
     <meta name="description" content="Free community events in Montgomery County, Maryland. Find an event near you and reserve a spot.">
     <meta name="theme-color" content="#f3f2ee">
     
-    <!-- Official Supabase CDN library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+   
 
 
     <!-- Corrected Content Security Policy layout inside the head -->
@@ -217,6 +215,8 @@ input,select,textarea{min-width:0;max-width:100%}
 <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
 <div id="toast" role="status" hidden></div>
 <canvas id="confetti" class="fixed inset-0 pointer-events-none" style="z-index:70" aria-hidden="true"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
 <script>
   let supabaseClient = null;
