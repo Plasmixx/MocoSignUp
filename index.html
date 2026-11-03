@@ -440,7 +440,7 @@ document.querySelector('.tabs').onclick=e=>{const t=e.target.closest('[data-v]')
 document.addEventListener('click',e=>{
  const c=e.target.closest('[data-close]');if(c)$(c.dataset.close).hidden=true;
  if(e.target.classList.contains('ov'))e.target.hidden=true;
- const i=e.target.closest('[data-info]');if(i){const k=i.dataset.info,x=['es','zh','fr','ko'].indexOf(lang),g=s=>x<0?null:(TR[s]||[])[x];$('info-t').textContent=g('i.'+k+'.t')||INFO[k][0];$('info-b').textContent=g('i.'+k+'.b')||INFO[k][1];show('m-info')}
+ const i=e.target.closest('[data-info]');if(i){const k=i.dataset.info,x=['es','zh','fr','ko'].indexOf(lang),g=s=>x<0?null:(TR[s]||[])[x];$('info-t').textContent=g('i.'+k+'.t')||INFO[k][0];$('info-b').textContent=g('i.'+k+'.b')||INFO[k][1];if(k==='access'){$('info-b').insertAdjacentHTML('beforeend','<p class="mt-4"><a href="/accessibility" style="color:#3b82f6;text-decoration:underline">Accessibility policy</a></p>');}show('m-info')}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.ov').forEach(o=>o.hidden=true);$('toast').hidden=true}});
 const INFO={
