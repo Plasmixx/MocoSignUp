@@ -334,7 +334,7 @@ const tm=t=>{const[h,m]=t.split(':').map(Number);return lang==='en'?`${h%12||12}
 const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString(LOC[lang],{weekday:'long',month:'long',day:'numeric'});
 document.addEventListener('focusin',e=>{const t=document.getElementById('toast');if(!t||t.hidden)return;const a=e.target.getBoundingClientRect(),b=t.getBoundingClientRect();if(a.bottom>b.top&&a.top<b.bottom&&a.right>b.left&&a.left<b.right){if(t.style.top){t.style.top='';t.style.bottom=''}else{t.style.bottom='auto';t.style.top='calc(16px + env(safe-area-inset-top,0px))'}}});
 function toast(m){const t=$('toast');t.style.top='';t.style.bottom='';t.textContent=tr(m);t.hidden=false;{const l=$('live');l.textContent='';setTimeout(()=>l.textContent=tr(m),60)}clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,7000)}
-const show=id=>$(id).hidden=false;
+let lastFocus=null;const show=id=>{lastFocus=document.activeElement;$(id).hidden=false;const f=$(id).querySelector('button,input,select,textarea,a[href]');if(f)f.focus()};
 
 /* ---------- Moderation ---------- */
 const BADL='inappropriate language',LEET={'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','$':'s','!':'i','|':'i','+':'t'};
@@ -442,7 +442,11 @@ document.addEventListener('click',e=>{
  if(e.target.classList.contains('ov'))e.target.hidden=true;
  const i=e.target.closest('[data-info]');if(i){const k=i.dataset.info,x=['es','zh','fr','ko'].indexOf(lang),g=s=>x<0?null:(TR[s]||[])[x];$('info-t').textContent=g('i.'+k+'.t')||INFO[k][0];$('info-b').textContent=g('i.'+k+'.b')||INFO[k][1];if(k==='access'){$('info-b').insertAdjacentHTML('beforeend','<p class="mt-4"><a href="/accessibility" style="color:#3b82f6;text-decoration:underline">Accessibility policy</a></p>');}show('m-info')}
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.ov').forEach(o=>o.hidden=true);$('toast').hidden=true}});
+document.addEventListener('keydown',e=>{const d=document.querySelector('.ov:not([hidden])');if(!d||e.key!=='Tab')return;const f=[...d.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea')].filter(x=>x.offsetParent!==null);if(!f.length)return;const i=f.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}});
+let escOpen=false;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')escOpen=!!document.querySelector('.ov:not([hidden])')},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&escOpen&&lastFocus&&lastFocus.focus)setTimeout(()=>lastFocus.focus(),0)});
+document.addEventListener('click',e=>{if(e.target.closest('[data-close]')&&lastFocus&&lastFocus.focus)setTimeout(()=>lastFocus.focus(),0)});
 const INFO={
  help:['Need a hand?','You can reach out to us at help@mocosignup.com to get quick help from a real person.'],
  privacy:['Your privacy','Browsing and signing up need no account. Posting needs no account. Profiles and sign-ups are stored securely and privately on the server. We never sell your information.'],
