@@ -276,6 +276,7 @@ async function loadServerData(){
     const {data:ev, error:evErr} = await supabaseClient.from('events').select('*').order('event_date', {ascending:true});
     if(evErr) throw evErr;
     events = (ev||[]).map(r=>{const a=dbEventToApp(r); if(r.profiles) a.by=r.profiles.display_name||''; return a;});
+await loadBadges();
     // Real signup counts only (no names/emails). Requires the event_signup_counts view from setup step 2.
     try{
       const {data:cnt} = await supabaseClient.from('event_signup_counts').select('*');
@@ -382,7 +383,7 @@ function card(e){
   ${(e.hot||g>=HOT)?'<span class="tag">HOT</span>':''}
   <h3 lang="en">${esc(e.title)}</h3>
   <p class="meta">EVT-${String(e.id).slice(0,8)} / ${tm(e.time)} / ${esc(e.hood).toUpperCase()}</p>
-  ${e.reps?`<p class="muted" style="font-size:1.0625rem">${T('Repeats weekly through {d}',{d:fmtD(lastD(e))})}</p>`:''}
+${organizerHTML(e)}
   <p lang="en">${esc(e.place)}</p><p class="muted mt-1" lang="en">${esc(e.desc)}</p><div class="row mt-2" style="gap:8px">${e.reps?`<span class="tag">${esc(tr('Weekly')).toUpperCase()}</span>`:''}${e.cat?`<span class="tag" style="border-color:var(--line2);color:var(--muted)">${esc(tr(e.cat)).toUpperCase()}</span>`:''}${(e.acc||[]).map(a=>`<span class="tag" style="border-color:var(--ok);color:var(--ok)">${esc(tr(a)).toUpperCase()}</span>`).join('')}</div>
   <div class="bar"><i style="width:${Math.round(100*g/(g+left||1))}%"></i></div>
   <p class="cap"><b>${g}</b> ${tr('going')} / <b>${left}</b> ${tr(left===1?'spot left':'spots left')}</p>
