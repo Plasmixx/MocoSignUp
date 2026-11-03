@@ -567,11 +567,12 @@ function renderSettings(){
  <button class="chip" id="s-langs" aria-expanded="${langOpen}" style="width:100%;justify-content:space-between"><span>${tr('Languages')}</span><span class="mono">${LANGS[lang]} ${langOpen?'▲':'▼'}</span></button>${langOpen?`<div class="row">${Object.keys(LANGS).map(k=>`<button class="chip" data-lang="${k}" lang="${k}" aria-pressed="${k===lang}">${LANGS[k]}</button>`).join('')}</div>`:''}`;
  if(!user)h+=`<div class="card"><p class="kicker">Account</p><p class="mt-2">Log in to add a profile picture, bio, hobbies and groups.</p><button class="btn mt-4" id="s-login">Log in</button></div>`;
  else h+=`<div class="row" style="flex-wrap:nowrap;gap:16px">${avSVG(user.name,P.color,64,P.photo)}<div><h3>${esc(user.name)}</h3><p class="meta" style="margin:0">${user.role==='admin'?'ADMIN':'MEMBER'}</p></div></div>
+ h+=`<div><label for="s-name">Username</label><input class="field" id="s-name" maxlength="40" value="${esc(user.name)}"></div>`;
  <div><p class="lab">Profile picture</p><div class="row">${COLORS.map((c,i)=>`<button class="sw" data-c="${i}" style="background:${c}" aria-label="${tr('Color')} ${i+1}" aria-pressed="${!P.photo&&P.color===i}"></button>`).join('')}<button class="chip" id="s-up">Upload image</button></div><input type="file" id="s-file" accept="image/*" hidden></div>
  <div><label for="s-bio">Bio</label><textarea class="field" id="s-bio" rows="3" maxlength="160" placeholder="Tell your neighbors a little about you">${esc(P.bio)}</textarea></div>
  <div><p class="lab">Hobbies</p><div class="row">${chips(P.opts.hobbies,P.hobbies,'hobbies')}</div>${addRow('hobbies')}</div>
  <div><p class="lab">Groups</p><div class="row">${chips(P.opts.groups,P.groups,'groups')}</div>${addRow('groups')}</div>
- <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-save">Save profile</button><button class="btn alt" id="s-out">Log out</button><button class="btn alt" id="s-claim">Claim my events</button>`;
+ <p id="s-msg" style="font-weight:700" role="status"></p><button class="btn" id="s-name-save">Save username</button><button class="btn alt" id="s-out">Log out</button><button class="btn alt" id="s-claim">Claim my events</button>`;
  $('set-body').innerHTML=h;
 }
 const setMsg=(t,bad)=>{const m=$('s-msg');if(m){m.style.color=bad?'var(--warn)':'var(--ok)';m.textContent=tr(t)}};
