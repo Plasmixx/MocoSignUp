@@ -469,7 +469,7 @@ $('f-new').onsubmit=async ev=>{
  const mod=await supabaseClient.functions.invoke('moderate-event',{body:{text:v.title+' '+v.place+' '+v.desc}});
  if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again.';$('warn').hidden=false;return;}
 }catch(e){toast('Could not check that event. Please try again.');return}
- if(!editing){if(Date.now()<busyUntil)return;busyUntil=Date.now()+1500}
+ if(!editing){if(window.__posting)return;window.__posting=true;if($('f-btn')){$('f-btn').disabled=true;$('f-btn').textContent='Publishing…'}}
  const ok=true;const creatorKey=user?null:await ensureCreatorKey();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
  if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}
 if(isCreatorEvent(ev0)&&!ev0.owner&&!isAdmin()){
@@ -481,9 +481,9 @@ if(isCreatorEvent(ev0)&&!ev0.owner&&!isAdmin()){
   if(error){toast('Could not save that event. Please try again.');return}
   cancelEdit();await loadServerData();setView('feed');celebrate('Event updated!',ok?'Your changes are live.':'Parks staff will review your changes before the event shows again.');return}
   const {error} = await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user?user.k:null, creator_hash:creatorKey?creatorKey.hash:null, approved:ok, is_hot:isHot});
-  if(error){toast('Could not publish that event. Please try again.');return}
+  if(error){window.__posting=false;if($('f-btn')){$('f-btn').disabled=false;$('f-btn').textContent=tr('Publish event')};toast('Could not publish that event. Please try again.');return}
   await loadServerData();
- clearDraft();$('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
+ window.__posting=false;if($('f-btn')){$('f-btn').disabled=false;$('f-btn').textContent=tr('Publish event')};clearDraft();$('f-new').reset();hood='All';renderFilters();renderFeed();setView('mine');
  celebrate('You’ve made an event!',ok?'It’s live in the feed now.':'Parks staff review new events first, so it will appear in the feed once approved.');
 };
 
