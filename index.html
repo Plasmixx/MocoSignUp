@@ -476,6 +476,19 @@ function celebrate(t,s){$('cel-ok').textContent=tr('Done');$('cel-t').textConten
 $('f-hood').innerHTML+=HOODS.map(h=>`<option>${h}</option>`).join('');
 [['f-title',60],['f-place',80],['f-desc',300]].forEach(([i,n])=>$(i).maxLength=n);
 $('f-date').min=new Date().toLocaleDateString('en-CA');
+function isSlop(title,desc){
+ const w=desc.toLowerCase().match(/[a-z]+/g)||[];
+ if(w.length>=3){
+  if(/(\b[a-z]+\b)(\s+\1){2,}/i.test(desc))return true;
+  if(new Set(w).size/w.length<0.35)return true;
+ }
+ const t=title.toLowerCase().replace(/[^a-z]/g,'');
+ if(t.length>=8&&!title.includes(' ')){
+  const vow=(t.match(/[aeiou]/g)||[]).length;
+  if(vow/t.length<0.25)return true;
+ }
+ return false;
+}
 $('f-new').onsubmit=async ev=>{
  ev.preventDefault();
  if(!$('f-agree')||!$('f-agree').checked){$('warn').textContent='Please agree to the Terms of Service and Privacy Policy to publish an event.';$('warn').hidden=false;return}
@@ -485,6 +498,7 @@ $('f-new').onsubmit=async ev=>{
  Object.values(ids).forEach(i=>{$(i).classList.remove('bad');$(i).removeAttribute('aria-invalid')});$('warn').hidden=true;
  const blank=Object.keys(ids).filter(k=>k!=='url'&&(k==='spots'?!(v.spots>0):!v[k]));
  const hit=findRestricted(v.title+' '+v.place+' '+v.desc),probs=check(v,ids);
+if(isSlop(v.title,v.desc)){$('f-warn').textContent='Please use a clear event title and a real description, not repeated words or gibberish.';$('f-warn').hidden=false;return}
  if(blank.length||hit.length||probs.length){
   blank.forEach(k=>$(ids[k]).classList.add('bad'));
   let m=blank.length?tr('Please fill in every field before publishing.')+' ':'';
