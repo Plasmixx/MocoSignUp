@@ -477,6 +477,7 @@ $('f-hood').innerHTML+=HOODS.map(h=>`<option>${h}</option>`).join('');
 [['f-title',60],['f-place',80],['f-desc',300]].forEach(([i,n])=>$(i).maxLength=n);
 $('f-date').min=new Date().toLocaleDateString('en-CA');
 function isSlop(title,desc){
+const dw=desc.trim().split(/\s+/).filter(Boolean);if(dw.length<3)return true;if(dw.some(w=>w.length>20))return true;
  const w=desc.toLowerCase().match(/[a-z]+/g)||[];
  if(w.length>=3){
   if(/(\b[a-z]+\b)(\s+\1){2,}/i.test(desc))return true;
