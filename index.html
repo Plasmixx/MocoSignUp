@@ -853,6 +853,7 @@ $('f-cancel').onclick=()=>{cancelEdit();setView('mine')};
 const cnt=id=>{const e=events.find(x=>x.id===id),c=e&&cur(e);return signups.filter(s=>s.id===id&&c&&s.d===c.date).length};
 function okUrl(u){try{const x=new URL(u);if(x.protocol!=='https:')return false;const h=x.hostname.toLowerCase(),d=n=>h===n||h.endsWith('.'+n);return d('montgomeryparks.org')||d('montgomerycountymd.gov')||(d('activecommunities.com')&&x.pathname.toLowerCase().startsWith('/activemontgomery'))}catch(_){return false}}
 function startEdit(id){const ev=events.find(x=>x.id===id);editing=ev.id;$('f-title').value=ev.title;$('f-hood').value=ev.hood;$('f-date').value=ev.date;$('f-time').value=ev.time;$('f-place').value=ev.place;$('f-spots').value=ev.spots;$('f-desc').value=ev.desc;$('f-cat').value=ev.cat||'';$('f-url').value=ev.url||'';$('f-rep').value=String(ev.reps||0);if($('f-hot'))$('f-hot').checked=!!ev.hot;document.querySelectorAll('#f-acc input').forEach(i=>i.checked=(ev.acc||[]).includes(i.value));$('f-btn').textContent=tr('Save changes');$('f-cancel').hidden=false;setView('mgr')}
+if($('f-lang'))$('f-lang').value=ev.lang||'en';
 async function delClick(id){
  const re=()=>{renderFilters();renderFeed();if(view==='mine')renderMine()};
  if(delAsk===id){if(editing===id)cancelEdit();const evDel=events.find(x=>x.id===id);
