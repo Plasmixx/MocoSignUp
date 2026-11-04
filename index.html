@@ -162,18 +162,18 @@ input,select,textarea{min-width:0;max-width:100%}
  <section id="v-mgr" class="mt-10" hidden>
   <p class="kicker">New event</p><h2 class="mt-2">Create an event</h2>
   <p class="muted mt-2 mb-8">Letters, numbers and basic punctuation only. No links, emails, phone numbers, ALL CAPS or money-related words. Events that pass our checks appear in the feed right away.</p>
-  <form id="f-new" class="card stack" novalidate autocomplete="moco-event">
+  <form id="f-new" class="card stack" novalidate autocomplete="off">
    <div id="warn" class="note" role="alert" hidden></div>
-   <div><label for="f-title">Event name</label><input class="field" id="f-title" aria-describedby="warn" placeholder="Morning walking club" autocomplete="moco-event"></div>
+   <div><label for="f-title">Event name</label><input class="field" id="f-title" aria-describedby="warn" placeholder="Morning walking club" autocomplete="off"></div>
    <div><label for="f-hood">Neighborhood</label><select class="field" id="f-hood" aria-describedby="warn"><option value="">Choose one</option></select></div>
    <div><label for="f-cat">Category</label><select class="field" id="f-cat" aria-describedby="warn"><option value="">Choose one</option></select></div>
    <div class="grid sm:grid-cols-2 gap-5"><div><label for="f-date">Date</label><input class="field" type="date" id="f-date" aria-describedby="warn"></div><div><label for="f-time">Start time</label><input class="field" type="time" id="f-time" aria-describedby="warn"></div></div>
-   <div><label for="f-place">Location</label><input class="field" id="f-place" aria-describedby="warn" placeholder="Rockville Senior Center" autocomplete="moco-event"></div>
+   <div><label for="f-place">Location</label><input class="field" id="f-place" aria-describedby="warn" placeholder="Rockville Senior Center" autocomplete="off"></div>
    <div><label for="f-spots">Spots</label><input class="field" type="number" min="1" max="100" id="f-spots" aria-describedby="warn" placeholder="20"></div>
    <div><label for="f-rep">Repeat</label><select class="field" id="f-rep"><option value="0">Does not repeat</option></select></div>
-   <div><label for="f-url">Official registration link (optional)</label><input class="field" id="f-url" type="url" aria-describedby="warn" placeholder="https://" autocomplete="moco-event" maxlength="200"></div>
+   <div><label for="f-url">Official registration link (optional)</label><input class="field" id="f-url" type="url" aria-describedby="warn" placeholder="https://" autocomplete="off" maxlength="200"></div>
    <div id="f-acc"><p class="lab">Accessibility (check all that apply)</p></div>
-   <div><label for="f-desc">What to expect</label><textarea class="field" id="f-desc" aria-describedby="warn" rows="3" placeholder="A short, friendly description" autocomplete="moco-event"></textarea></div>
+   <div><label for="f-desc">What to expect</label><textarea class="field" id="f-desc" aria-describedby="warn" rows="3" placeholder="A short, friendly description" autocomplete="off"></textarea></div>
       <div id="f-hot-wrap" hidden><label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-hot" style="width:24px;height:24px"> <span>List as a "Hot" event.</span></label><p class="muted mt-2" style="font-size:1rem">Admin only. This event will appear at the top of the feed, and will show when visitors click Hot events, even before it has many sign-ups.</p></div>
    <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-agree" style="width:24px;height:24px"> <span>I agree to the <a href="/terms" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline">Privacy Policy</a></span></label>
 <button class="btn" type="submit" id="f-btn">Publish event</button>
