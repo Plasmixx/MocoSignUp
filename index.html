@@ -180,6 +180,7 @@ input,select,textarea{min-width:0;max-width:100%}
       <div id="f-hot-wrap" hidden><label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-hot" style="width:24px;height:24px"> <span>List as a "Hot" event.</span></label><p class="muted mt-2" style="font-size:1rem">Admin only. This event will appear at the top of the feed, and will show when visitors click Hot events, even before it has many sign-ups.</p></div>
    <label class="chip" style="text-transform:none;letter-spacing:0;font:700 1.125rem 'Atkinson Hyperlegible',sans-serif;margin:0;color:var(--text)"><input type="checkbox" id="f-agree" style="width:24px;height:24px"> <span>I agree to the <a href="/terms" target="_blank" rel="noopener" class="sitelink">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener" class="sitelink">Privacy Policy</a></span></label>
 <button class="btn" type="submit" id="f-btn">Publish event</button>
+      <p id="f-warn2" class="note" hidden role="alert"></p>
    <button class="btn alt" type="button" id="f-cancel" hidden>Cancel editing</button>
   </form>
  </section>
@@ -493,6 +494,7 @@ const lt=all.replace(/[^a-z]/g,'');const vv=(lt.match(/[aeiou]/g)||[]).length;if
  }
  return false;
 }
+const fw1=$('f-warn'),fw2=$('f-warn2');if(fw1&&fw2){const syncFw=()=>{fw2.textContent=fw1.textContent;fw2.hidden=fw1.hidden;};new MutationObserver(syncFw).observe(fw1,{childList:true,characterData:true,subtree:true,attributes:true});}
 $('f-new').onsubmit=async ev=>{
  ev.preventDefault();
  if(!$('f-agree')||!$('f-agree').checked){$('warn').textContent='Please agree to the Terms of Service and Privacy Policy to publish an event.';$('warn').hidden=false;return}
