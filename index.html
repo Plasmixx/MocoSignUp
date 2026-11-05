@@ -502,7 +502,7 @@ $('f-new').onsubmit=async ev=>{
  Object.values(ids).forEach(i=>{$(i).classList.remove('bad');$(i).removeAttribute('aria-invalid')});$('warn').hidden=true;
  const blank=Object.keys(ids).filter(k=>k!=='url'&&(k==='spots'?!(v.spots>0):!v[k]));
  const hit=findRestricted(v.title+' '+v.place+' '+v.desc),probs=check(v,ids);
-if(isSlop(v.title,v.desc)){$('f-warn').textContent='Please use a clear event title and a real description, not repeated words or gibberish.';$('f-warn').hidden=false;return}
+if(isSlop(v.title,v.desc)){const w=$('f-warn');if(w){w.textContent='Please use a clear event title and a real description, not repeated words or gibberish.';w.hidden=false}else{toast('Please use a clear event title and a real description, not repeated words or gibberish.')}return}
  if(blank.length||hit.length||probs.length){
   blank.forEach(k=>$(ids[k]).classList.add('bad'));
   let m=blank.length?tr('Please fill in every field before publishing.')+' ':'';
