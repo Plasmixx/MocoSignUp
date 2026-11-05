@@ -258,7 +258,7 @@ const live=()=>events.filter(e=>e.ok!==false).map(e=>{const c=cur(e);return c&&{
 /* ---------- Server data (Supabase) ---------- */
     // Secret Admin Password - STOP READING - User: MocoSignUpAdmin Pass: secretAdminPassword123
 function dbEventToApp(r){
-  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', lang:r.language||'en', url:r.official_url||'', ok:r.comroved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, ch:r.creator_hash||'', at:r.created_at?Date.parse(r.created_at):Date.now()};
+  return {id:r.id, cat:r.category, acc:r.accessibility||[], title:r.title, hood:r.neighborhood, date:r.event_date, reps:r.repeats_weeks||0, time:(r.start_time||'').slice(0,5), place:r.place, spots:r.spots, desc:r.description||'', lang:r.language||'en', url:r.official_url||'', ok:r.approved, hot:!!r.is_hot, by:r.owner_name||'', owner:r.owner_id, ch:r.creator_hash||'', at:r.created_at?Date.parse(r.created_at):Date.now()};
 }
 let creatorToken=null,creatorHash=null;
 try{creatorToken=localStorage.getItem('moco-creator-token');creatorHash=localStorage.getItem('moco-creator-hash')}catch(_){}
@@ -514,8 +514,7 @@ if(isSlop(v.title,v.desc)){const w=$('f-warn');if(w){w.textContent='Please use a
  }
     try{
  const mod=await supabaseClient.functions.invoke('moderate-event',{body:{text:v.title+' '+v.place+' '+v.desc}});
- if(mod.data&&mod.data.flagged){$('warn').textContent='That event was flagged for review. Please reword it and try again — try removing any money, sales, link, or contact words, and keep it short and friendly.';$('warn').hidden=false;return;}
-}catch(e){toast('Could not check that event. Please try again.');return}
+if(mod.data&&mod.data.flagged){const ck=user?null:await ensureCreatorKey();const {error}=await supabaseClient.from('events').insert({title:v.title, neighborhood:v.hood, category:v.cat, official_url:v.url||null, accessibility:v.acc, event_date:v.date, start_time:v.time, place:v.place, spots:v.spots, description:v.desc, language:v.lang, repeats_weeks:Math.max(0,Math.min(10,+$('f-rep').value||0)), owner_id:user?user.k:null, creator_hash:ck?ck.hash:null, approved:false, is_hot:false});if(error){$('warn').textContent='Could not send that event for review. Please try again.';$('warn').hidden=false;return}$('warn').textContent='That event was sent for review. It will not show in the public feed until an admin approves it.';$('warn').hidden=false;return;}catch(e){toast('Could not check that event. Please try again.');return}
  if(!editing){if(window.__posting)return;window.__posting=true;if($('f-btn')){$('f-btn').disabled=true;$('f-btn').textContent='Publishing…'}}
  const ok=true;const creatorKey=user?null:await ensureCreatorKey();const isHot=isAdmin()&&!!($('f-hot')&&$('f-hot').checked);
  if(editing){const ev0=events.find(x=>x.id===editing);if(!ev0){cancelEdit();toast('That event no longer exists.');return}
