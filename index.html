@@ -494,7 +494,7 @@ const lt=all.replace(/[^a-z]/g,'');const vv=(lt.match(/[aeiou]/g)||[]).length;if
  }
  return false;
 }
-const fw1=$('f-warn'),fw2=$('f-warn2');if(fw1&&fw2){const syncFw=()=>{fw2.textContent=fw1.textContent;fw2.hidden=fw1.hidden;};new MutationObserver(syncFw).observe(fw1,{childList:true,characterData:true,subtree:true,attributes:true});}
+const fw2=$('f-warn2');const syncAll=()=>{const s1=$('f-warn'),s2=$('warn');const src=(s2&&!s2.hidden)?s2:(s1&&!s1.hidden)?s1:null;if(!fw2)return;if(src){fw2.textContent=src.textContent;fw2.hidden=false}else{fw2.hidden=true;}};if(fw2){['f-warn','warn'].forEach(id=>{const el=$(id);if(el)new MutationObserver(syncAll).observe(el,{childList:true,characterData:true,subtree:true,attributes:true});});}
 $('f-new').onsubmit=async ev=>{
  ev.preventDefault();
  if(!$('f-agree')||!$('f-agree').checked){$('warn').textContent='Please agree to the Terms of Service and Privacy Policy to publish an event.';$('warn').hidden=false;return}
