@@ -478,6 +478,9 @@ $('f-hood').innerHTML+=HOODS.map(h=>`<option>${h}</option>`).join('');
 $('f-date').min=new Date().toLocaleDateString('en-CA');
 function isSlop(title,desc){
 const dw=desc.trim().split(/\s+/).filter(Boolean);if(dw.length<3)return true;if(dw.some(w=>w.length>20))return true;
+const all=(title+' '+desc).toLowerCase();if(/asdf|sdfg|qwer|zxcv|hjkl/.test(all))return true;
+const lw=all.match(/[a-z]{3,}/g)||[];const nv=lw.filter(w=>!/[aeiou]/.test(w));if(nv.length>=2&&nv.length/lw.length>=0.3)return true;
+const lt=all.replace(/[^a-z]/g,'');const vv=(lt.match(/[aeiou]/g)||[]).length;if(lt.length>=20&&vv/lt.length<0.25)return true;
  const w=desc.toLowerCase().match(/[a-z]+/g)||[];
  if(w.length>=3){
   if(/(\b[a-z]+\b)(\s+\1){2,}/i.test(desc))return true;
